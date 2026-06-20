@@ -637,3 +637,60 @@ body {
     50% { transform: scale(1.3) rotate(10deg); filter: brightness(1.5); }
     100% { transform: scale(1) rotate(0); content: "🥠"; }
 }
+
+/* ==========================================
+   MOBIL RESPONSIVE BEÁLLÍTÁSOK (max 600px)
+   ========================================== */
+@media (max-width: 600px) {
+    /* Biztosítjuk, hogy a teljes háttér ne nyúljon túl a képernyőn */
+    body {
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    /* A fő panelt (vagy konténert) rugalmasra állítjuk */
+    .container, .game-box, #main-panel { 
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    /* Luna (a mosómedve) méretét skálázzuk, hogy ne lógjon ki */
+    #Raccoon {
+        max-width: 180px; /* Mobilon picit kisebb legyen, hogy elférjenek alatta a gombok */
+        height: auto;
+    }
+
+    /* Az akció gombokat (Etetés, Itatás, Simogatás) egymás alá vagy 2 oszlopba rendezzük */
+    .button-group, .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 oszlopos elrendezés */
+        gap: 10px;
+        width: 100%;
+    }
+
+    /* Ha van olyan gomb, ami nagyon hosszú, az foglalja el a teljes sort */
+    .button-group button:last-child {
+        grid-column: span 2;
+    }
+
+    /* A minijátékok rácsait (pl. Tic-Tac-Toe, Memory) lekicsinyítjük, hogy ne nyomják szét a kijelzőt */
+    .ttt-board, #memory-grid {
+        width: 100% !important;
+        max-width: 260px !important;
+        margin: 0 auto;
+        gap: 5px;
+    }
+
+    /* A szövegek méretét is finomítjuk, hogy ne törjenek csúnyán több sorba */
+    h1, .title {
+        font-size: 1.5rem !important;
+    }
+
+    .status-text, p {
+        font-size: 0.9rem !important;
+    }
+}
