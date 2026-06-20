@@ -21,17 +21,29 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 function initSupabase() {
-    if (!window.supabase) {
-        console.error("Supabase not loaded");
+    try {
+        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (err) {
+        console.error("Failed to initialize Supabase:", err);
         return null;
     }
-
-    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
 
-const discordSdk = window.location!==window.parent ? new DiscordSDK('1088855742502678538') : null;
+const isDiscordActivity =
+    window.location.search.includes("frame_id=") ||
+    window.location.search.includes("instance_id=");
+
+let discordSdk = null;
+
+try {
+    if (isDiscordActivity) {
+        discordSdk = new DiscordSDK('1088855742502678538');
+    }
+} catch (err) {
+    console.warn("Discord SDK unavailable, running in web mode.", err);
+}
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
