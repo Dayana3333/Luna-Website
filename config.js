@@ -16,12 +16,23 @@ let currentSaveKey = null;
 
 const SUPABASE_URL = "https://borusbjllkypavkoujqk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvcnVzYmpsbGt5cGF2a291anFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzgzMzEsImV4cCI6MjA5NzU1NDMzMX0.LD1tM6qd9DdSK0SL4DGQyK0Zb-X-chgR1IokR_m2Ox4";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient;
 
-const discordSdk = typeof DiscordSDK !== 'undefined'
-    ? new DiscordSDK("1088855742502678538")
-    : null;
+function initSupabase() {
+    if (!window.supabase) {
+        console.error("Supabase not loaded");
+        return null;
+    }
 
+    return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+supabaseClient = initSupabase();
+
+//const discordSdk = typeof DiscordSDK !== 'undefined' //!CHANGE BACK LATER
+    // ? new DiscordSDK("1088855742502678538")
+    //: null;
+const discordSdk = null;
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
@@ -695,4 +706,8 @@ function resetFortuneCookie() {
 SetBackground();
 setInterval(SetBackground, 60 * 1000);
 ResetSleepTimer();
-setupDiscordActivity();
+
+window.addEventListener("load", () => {
+    setupDiscordActivity();
+    FetchPetData();
+});
