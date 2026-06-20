@@ -1,3 +1,5 @@
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -24,15 +26,12 @@ function initSupabase() {
         return null;
     }
 
-    return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
 
-//const discordSdk = typeof DiscordSDK !== 'undefined' //!CHANGE BACK LATER
-    // ? new DiscordSDK("1088855742502678538")
-    //: null;
-const discordSdk = null;
+const discordSdk = window.location!==window.parent ? new DiscordSDK('1088855742502678538') : null;
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
