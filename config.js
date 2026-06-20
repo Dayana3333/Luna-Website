@@ -1,5 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
+
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -25,13 +26,13 @@ function initSupabase() {
         console.error("Supabase not loaded");
         return null;
     }
-
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
 
 const discordSdk = window.location!==window.parent ? new DiscordSDK('1088855742502678538') : null;
+
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
@@ -54,9 +55,7 @@ async function setupDiscordActivity() {
         });
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
         
-        // Frissítjük a Discord Rich Presence státuszt az érvényes asset névvel
         await updateDiscordPresence();
-
         FetchPetData();
     } catch (error) {
         console.error("Discord Activity error:", error);
@@ -65,12 +64,11 @@ async function setupDiscordActivity() {
     }
 }
 
-// A státusz frissítése a helyes háttérképpel és névvel
 async function updateDiscordPresence() {
     try {
         await discordSdk.commands.setActivity({
             activity: {
-                type: 0, // 0 = Playing (Játszik)
+                type: 0,
                 details: "Chilling with Luna 🦝",
                 state: "Virtual Pet Activity",
                 assets: {
@@ -307,7 +305,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
     }, DurationMS);
 }
 
-function Activity(ActionType) {
+window.Activity = function(ActionType) {
     const now = Date.now();
 
     if ((ActionType === "Feed" || ActionType === "Water") && ActivityCooldowns[ActionType] > now) return;
@@ -352,7 +350,7 @@ function Activity(ActionType) {
 // LOFI RÁDIÓ
 // ==========================================
 
-function toggleRadio() {
+window.toggleRadio = function() {
     const player = document.getElementById('youtube-player');
     const radioImg = document.getElementById('lofi-radio');
     const statusText = document.getElementById('radio-status');
@@ -379,7 +377,7 @@ function toggleRadio() {
 // BOLT
 // ==========================================
 
-function BuyItem(ItemName, ItemPrice) {
+window.BuyItem = function(ItemName, ItemPrice) {
     if (Raccooins < ItemPrice) {
         alert("❌ You don't have enough Raccooins! 🦝");
         return;
@@ -436,7 +434,7 @@ function checkMinigameUnlock(currentRP) {
     }
 }
 
-function changeGame(direction) {
+window.changeGame = function(direction) {
     document.getElementById(`game-view-${currentGameIndex}`).style.display = "none";
     currentGameIndex = (currentGameIndex + direction + totalGames) % totalGames;
     document.getElementById(`game-view-${currentGameIndex}`).style.display = "flex";
@@ -450,7 +448,7 @@ function changeGame(direction) {
 let tttBoard = ["", "", "", "", "", "", "", "", ""];
 let tttActive = true;
 
-function playerMove(idx) {
+window.playerMove = function(idx) {
     if (tttBoard[idx] !== "" || !tttActive) return;
     tttBoard[idx] = "X";
     document.querySelectorAll('.ttt-cell')[idx].innerText = "X";
@@ -484,7 +482,7 @@ function checkTTTWin(s) {
     return w.some(c => c.every(i => tttBoard[i] === s));
 }
 
-function resetTTT() {
+window.resetTTT = function() {
     tttBoard = ["", "", "", "", "", "", "", "", ""]; tttActive = true;
     document.getElementById('ttt-status').innerText = "Your turn (❌)";
     document.querySelectorAll('.ttt-cell').forEach(c => { c.innerText = ""; c.style.color = "#fff"; });
@@ -537,7 +535,7 @@ function flipCard(card) {
     }
 }
 
-function restartMemoryGame() {
+window.restartMemoryGame = function() {
     initMemoryGame();
 }
 
@@ -548,7 +546,7 @@ let sushiScore = 0;
 let sushiTimeLeft = 15;
 const goodFoods = ['🍣','🥟','🍜','🧋','🍡','🍤'];
 
-function startSushiGame() {
+window.startSushiGame = function() {
     clearInterval(sushiTimer);
     sushiScore = 0; sushiTimeLeft = 15;
     document.getElementById('sushi-status').innerText = `Score: 0 | Time: 15s`;
@@ -574,7 +572,7 @@ function moveSushi() {
     target.style.display = "block";
 }
 
-function tapSushi() {
+window.tapSushi = function() {
     if (sushiTimeLeft > 0) { sushiScore++; moveSushi(); }
 }
 
@@ -592,7 +590,7 @@ function nextScramble() {
     document.getElementById('scramble-status').innerText = "Unscramble the word!";
 }
 
-function checkScrambleGuess() {
+window.checkScrambleGuess = function() {
     let guess = document.getElementById('scramble-input').value.toUpperCase().trim();
     if (guess === currentWord) {
         document.getElementById('scramble-status').innerText = "🎉 Correct! +60RC";
@@ -603,7 +601,7 @@ function checkScrambleGuess() {
     }
 }
 
-// ---- 5. COOKIE CATCHER ----
+// ---- 5. COOKIE CATCHER (ÉRINTŐKÉPERNYŐ TÁMOGATÁSSAL!) ----
 
 let catcherScore = 0;
 let isCatcherActive = false;
@@ -617,17 +615,31 @@ const catcherStatus = document.getElementById('catcher-status');
 const catcherStartBtn = document.getElementById('catcher-start-btn');
 
 if (catcherZone && catcherBasket) {
-    catcherZone.addEventListener('mousemove', (e) => {
+    // 💡 Ez a függvény kezeli az egér és az ujj mozgását is!
+    const moveBasket = (e) => {
         if (!isCatcherActive) return;
         const rect = catcherZone.getBoundingClientRect();
-        let x = e.clientX - rect.left - 15;
+        
+        // Ha mobilon vagyunk (touches), az első ujj pozícióját nézzük, különben az egérét
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        
+        let x = clientX - rect.left - 15;
         if (x < 0) x = 0;
         if (x > rect.width - 30) x = rect.width - 30;
         catcherBasket.style.left = x + 'px';
-    });
+    };
+
+    // Egér támogatás PC-n
+    catcherZone.addEventListener('mousemove', moveBasket);
+    
+    // Érintőképernyő támogatás telefonon
+    catcherZone.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Megakadályozza, hogy véletlenül görgessen az oldalon játék közben
+        moveBasket(e);
+    }, { passive: false });
 }
 
-function startCatcherGame() {
+window.startCatcherGame = function() {
     if (isCatcherActive) return;
     WakeUp();
     isCatcherActive = true;
@@ -641,6 +653,50 @@ function startCatcherGame() {
         catcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
         if (catcherTimer <= 0) endCatcherGame();
     }, 1000);
+}
+
+function spawnCatcherItem() {
+    if (!isCatcherActive || !catcherZone) return;
+    const item = document.createElement('div');
+    item.className = 'falling-cookie';
+    const items = ["🍪","🧋","✨","🎵","🍩"];
+    item.innerText = items[Math.floor(Math.random() * items.length)];
+    const zoneWidth = catcherZone.offsetWidth;
+    item.style.left = Math.random() * (zoneWidth - 25) + 'px';
+    item.style.top = '0px';
+    catcherZone.appendChild(item);
+    let topPos = 0;
+    const fallSpeed = Math.random() * 3 + 3;
+    const fallInterval = setInterval(() => {
+        if (!isCatcherActive) { clearInterval(fallInterval); item.remove(); return; }
+        topPos += fallSpeed;
+        item.style.top = topPos + 'px';
+        const basketLeft = parseInt(catcherBasket.style.left) || (catcherZone.offsetWidth / 2 - 15);
+        const itemLeft = parseInt(item.style.left);
+        if (topPos >= 175 && topPos <= 195) {
+            if (itemLeft >= basketLeft - 18 && itemLeft <= basketLeft + 25) {
+                catcherScore += 10;
+                catcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
+                clearInterval(fallInterval); item.remove(); return;
+            }
+        }
+        if (topPos > 210) { clearInterval(fallInterval); item.remove(); }
+    }, 20);
+}
+
+function endCatcherGame() {
+    isCatcherActive = false;
+    clearInterval(catcherInterval);
+    clearInterval(catcherCountdown);
+    catcherStartBtn.style.display = 'inline-block';
+    const gainedCoins = Math.floor(catcherScore * 0.6);
+    const gainedRP = Math.floor(catcherScore * 0.3);
+    Raccooins += gainedCoins;
+    RelationshipPoints += gainedRP;
+    UpdateUI();
+    SavePetData();
+    alert(`🎉 Game over!\nYou gained: ${catcherScore}\n💰 +${gainedCoins} RC\n❤️ +${gainedRP} RP`);
+    catcherStatus.innerText = "Move basket! Time: 20s";
 }
 
 // ---- 6. FORTUNE COOKIE ----
@@ -659,7 +715,7 @@ const fortuneMessages = [
     "Your kindness will be rewarded soon. ❤️"
 ];
 
-function clickFortuneCookie() {
+window.clickFortuneCookie = function() {
     if (isCookieCracked) return;
     WakeUp();
     cookieClicks++;
@@ -688,7 +744,7 @@ function clickFortuneCookie() {
     }
 }
 
-function resetFortuneCookie() {
+window.resetFortuneCookie = function() {
     cookieClicks = 0;
     isCookieCracked = false;
     document.getElementById('fortune-cookie-target').innerText = "🥠";
@@ -708,5 +764,4 @@ ResetSleepTimer();
 
 window.addEventListener("load", () => {
     setupDiscordActivity();
-    FetchPetData();
 });
