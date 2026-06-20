@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Your Pet's Home</title>
+
+    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="minigame-box" class="minigame-container locked">
+        <div class="minigame-header">
+            <button class="nav-btn" onclick="changeGame(-1)">&lt;</button>
+            <h2 id="menu-title">1 / 6</h2>
+            <button class="nav-btn" onclick="changeGame(1)">&gt;</button>
+        </div>
+        
+        <div id="minigame-overlay" class="game-overlay">
+            <span class="lock-icon">🔒</span>
+            <p class="lock-text" id="lock-requirement">Unlocks at 5,000 RP</p>
+        </div>
+
+        <div class="all-games-viewport">
+            
+            <div class="game-view" id="game-view-0">
+                <h3 class="game-title">Tic-Tac-Toe</h3>
+                <p class="game-status" id="ttt-status">Your turn (❌)</p>
+                <div class="ttt-board">
+                    <div class="ttt-cell" onclick="playerMove(0)"></div>
+                    <div class="ttt-cell" onclick="playerMove(1)"></div>
+                    <div class="ttt-cell" onclick="playerMove(2)"></div>
+                    <div class="ttt-cell" onclick="playerMove(3)"></div>
+                    <div class="ttt-cell" onclick="playerMove(4)"></div>
+                    <div class="ttt-cell" onclick="playerMove(5)"></div>
+                    <div class="ttt-cell" onclick="playerMove(6)"></div>
+                    <div class="ttt-cell" onclick="playerMove(7)"></div>
+                    <div class="ttt-cell" onclick="playerMove(8)"></div>
+                </div>
+                <button class="game-btn" onclick="resetTTT()">Reset Game</button>
+            </div>
+
+            <div class="game-view" id="game-view-1" style="display:none;">
+                <h3 class="game-title">Luna Memory Match</h3>
+                <p class="game-status" id="memory-status">Find the pairs!</p>
+                <div class="memory-board" id="memory-grid"></div>
+                <button class="game-btn" onclick="restartMemoryGame()">Restart</button>
+            </div>
+
+            <div class="game-view" id="game-view-2" style="display:none;">
+                <h3 class="game-title">Sushi Tap</h3>
+                <p class="game-status" id="sushi-status">Tap the food! Time: 15s</p>
+                <div class="sushi-area" id="sushi-tap-zone">
+                    <div id="sushi-target" onclick="tapSushi()">🍣</div>
+                </div>
+                <button class="game-btn" onclick="startSushiGame()">Start Game</button>
+            </div>
+
+            <div class="game-view" id="game-view-3" style="display:none;">
+                <h3 class="game-title">Word Scramble</h3>
+                <p class="game-status" id="scramble-status">Unscramble the word!</p>
+                <div class="scramble-container">
+                    <div id="scrambled-word">????</div>
+                    <input type="text" id="scramble-input" placeholder="Your guess...">
+                    <button class="game-btn" onclick="checkScrambleGuess()">Submit</button>
+                </div>
+            </div>
+
+            <div class="game-view" id="game-view-4" style="display:none;">
+                <h3 class="game-title">Cookie Catcher</h3>
+                <p class="game-status" id="catcher-status">Move your cursor! Time: 20s</p>
+                <div class="catcher-area" id="catcher-zone">
+                    <div id="catcher-basket">🥣</div>
+                </div>
+                <button class="game-btn" id="catcher-start-btn" onclick="startCatcherGame()">Start Game</button>
+            </div>
+
+            <div class="game-view" id="game-view-5" style="display:none;">
+                <h3 class="game-title">Fortune Cookie</h3>
+                <p class="game-status" id="cookie-status">Click the Fortune Cookie to break it!</p>
+                <div class="cookie-click-zone">
+                    <div id="fortune-cookie-target" onclick="clickFortuneCookie()">🥠</div>
+                </div>
+                <div id="cookie-fortune-text" style="min-height: 40px; margin-top: 10px; font-size: 14px; color: #f3da90; text-align: center; padding: 0 10px;"></div>
+                <button class="game-btn" id="cookie-reset-btn" onclick="resetFortuneCookie()" style="display: none;">New Cookie</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="radio-container">
+        <img id="lofi-radio" src="imgs/radio.png" alt="Lofi Radio" onclick="toggleRadio()">
+        <span id="radio-status">OFF</span>
+    </div>
+
+    <iframe id="youtube-player" src="https://www.youtube.com/embed/X4VbdwhkE10?enablejsapi=1&autoplay=0&mute=0"
+        style="display: none;" allow="autoplay; encrypted-media">
+    </iframe>
+
+    <div class="PetArea">
+        <h1 contenteditable="true" spellcheck="false" id="PetName">Luna</h1>
+
+        <div class="pet pet-idle">
+            <img src="imgs/raccoon.png" id="Raccoon">
+        </div>
+
+        <div class="Buttons">
+            <button class="Button" id="FeedButton" onclick="Activity('Feed')">🍜 Feed</button>
+            <button class="Button" id="WaterButton" onclick="Activity('Water')">💧 Water</button>
+            <button class="Button" onclick="Activity('Pet')">❤️ Pet</button>
+        </div>
+    </div>
+
+    <div class="Shop">
+        <div class="CoinContainer">
+            <div class="CoinIconContainer">
+                <img src="imgs/raccooin.png" title="Raccooin" alt="Raccooin" id="CoinIcon">
+            </div>
+            <div class="CoinTextContainer">10,000RC</div>
+        </div>
+
+        <div class="ItemsContainer">
+            <div class="ItemCard">
+                <div class="ItemPreview">
+                    <img src="imgs/bubble-tea.png" title="Bubble Tea" alt="Bubble Tea" class="ItemImage">
+                </div>
+                <div class="ItemDetails">
+                    <h3 class="ItemName">Bubble Tea</h3>
+                    <p class="ItemPrice">Price: 50RC</p>
+                    <button class="BuyButton" onclick="BuyItem('bubble_tea', 50)">Buy</button>
+                </div>
+            </div>
+
+            <div class="ItemCard">
+                <div class="ItemPreview">
+                    <img src="imgs/buns.png" title="Steamed Buns" alt="Steamed Buns" class="ItemImage">
+                </div>
+                <div class="ItemDetails">
+                    <h3 class="ItemName">Steamed Buns</h3>
+                    <p class="ItemPrice">Price: 80RC</p>
+                    <button class="BuyButton" onclick="BuyItem('pork_buns', 80)">Buy</button>
+                </div>
+            </div>
+
+            <div class="ItemCard">
+                <div class="ItemPreview">
+                    <img src="imgs/ramen.png" title="Ramen" alt="Ramen" class="ItemImage">
+                </div>
+                <div class="ItemDetails">
+                    <h3 class="ItemName">Ramen</h3>
+                    <p class="ItemPrice">Price: 100RC</p>
+                    <button class="BuyButton" onclick="BuyItem('ramen', 100)">Buy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="LevelContainer">
+            <h3 id="LevelTitle">Relationship Level</h3>
+            <div class="LevelValue" id="LevelDisplay">Strangers</div>
+        </div>
+
+        <div class="RelationshipContainer">
+            <h3 id="RelationshipTitle">Relationship Points</h3>
+            <div class="RelationshipValue" id="RelationshipDisplay">0 RP</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@1.0.0/dist/index.js"></script>
+    <script src="config.js"></script>
+</body>
+
+</html>
