@@ -201,9 +201,20 @@ const ActivityCooldowns = {
     Water: 0
 };
 
+// ==========================================
+// GLOBÁLIS KIEGÉSZÍTŐK 
+// ==========================================
 const MinigameCooldowns = [0, 0, 0, 0, 0, 0];
 const MinigameLocked = [false, false, false, false, false, false];
 let MinigameCooldownTimer = null;
+
+// Biztonsági változók az időzítőkhöz és rádióhoz, ha feljebb nem lennének ott:
+if (typeof SleepTimer === 'undefined') var SleepTimer = null;
+if (typeof ActivityTimer === 'undefined') var ActivityTimer = null;
+if (typeof SleepDelay === 'undefined') var SleepDelay = 30000; // 30 másodperc alvásig
+if (typeof isPlaying === 'undefined') var isPlaying = false;
+if (typeof ActivityCooldowns === 'undefined') var ActivityCooldowns = { Feed: 0, Water: 0 };
+
 
 // ==========================================
 // MINIJÁTÉK RENDSZER VÁLTOZÓI
@@ -211,7 +222,7 @@ let MinigameCooldownTimer = null;
 
 let currentGameIndex = 0;
 const totalGames = 6;
-const gameLimits = [5000, 100, 200, 300, 400, 500];
+const gameLimits = [0, 100, 200, 300, 400, 500]; 
 const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scramble", "Cookie Catcher", "Fortune Cookie Cracker"];
 
 // ==========================================
@@ -229,6 +240,7 @@ const NightBackgrounds = [
 ];
 
 function SetBackground() {
+    if (typeof Body === 'undefined') return; // Védelem, ha a Body nincs definiálva
     const Hour = new Date().getHours();
     const IsDay = Hour >= 6 && Hour < 20;
 
@@ -282,6 +294,7 @@ function SetBackground() {
 function ResetSleepTimer() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) return;
+    if (typeof Raccoon === 'undefined' || !Raccoon) return;
 
     SleepTimer = setTimeout(() => {
         Raccoon.src = 'imgs/sleep_raccoon.png';
@@ -292,6 +305,8 @@ function ResetSleepTimer() {
 function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
+    if (typeof Raccoon === 'undefined' || !Raccoon) return;
+    
     Raccoon.src = 'imgs/raccoon.png';
     Raccoon.classList.add('pet-idle');
 }
@@ -301,6 +316,7 @@ function WakeUp() {
 // ==========================================
 
 function PlayAnimation(Source, CssClass, DurationMS = 2000) {
+    if (typeof Raccoon === 'undefined' || !Raccoon) return;
     WakeUp();
     Raccoon.src = Source;
     Raccoon.classList.remove('pet-idle');
@@ -319,8 +335,7 @@ function Activity(ActionType) {
     const now = Date.now();
 
     if ((ActionType === "Feed" || ActionType === "Water") && ActivityCooldowns[ActionType] > now) return;
-
-    if (!currentSaveKey) return;
+    if (typeof currentSaveKey === 'undefined' || !currentSaveKey) return;
 
     if (ActionType === "Feed") {
         RelationshipPoints += 250;
@@ -353,7 +368,7 @@ function Activity(ActionType) {
         }
     }
 
-    SavePetData();
+    if (typeof SavePetData === 'function') SavePetData();
 }
 
 // ==========================================
@@ -370,15 +385,19 @@ function toggleRadio() {
     if (!isPlaying) {
         player.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[15]}', '*');
         player.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        radioImg.classList.add('radio-playing');
-        statusText.innerText = "🎵 Lofi ON";
-        statusText.style.color = "#00FF00";
+        if (radioImg) radioImg.classList.add('radio-playing');
+        if (statusText) {
+            statusText.innerText = "🎵 Lofi ON";
+            statusText.style.color = "#00FF00";
+        }
         isPlaying = true;
     } else {
         player.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        radioImg.classList.remove('radio-playing');
-        statusText.innerText = "OFF";
-        statusText.style.color = "#4a3e3d";
+        if (radioImg) radioImg.classList.remove('radio-playing');
+        if (statusText) {
+            statusText.innerText = "OFF";
+            statusText.style.color = "#4a3e3d";
+        }
         isPlaying = false;
     }
 }
@@ -388,6 +407,7 @@ function toggleRadio() {
 // ==========================================
 
 function BuyItem(ItemName, ItemPrice) {
+    if (typeof Raccooins === 'undefined') return;
     if (Raccooins < ItemPrice) {
         alert("❌ You don't have enough Raccooins! 🦝");
         return;
@@ -399,7 +419,7 @@ function BuyItem(ItemName, ItemPrice) {
 
     UpdateUI();
     TriggerLunaJoy();
-    SavePetData();
+    if (typeof SavePetData === 'function') SavePetData();
 }
 
 function TriggerLunaJoy() {
@@ -415,10 +435,16 @@ function TriggerLunaJoy() {
 // ==========================================
 
 function UpdateUI() {
-    document.querySelector('.CoinTextContainer').innerText = Raccooins.toLocaleString() + 'RC';
-    document.querySelector('#RelationshipDisplay').innerText = RelationshipPoints.toLocaleString() + 'RP';
+    const coinEl = document.querySelector('.CoinTextContainer');
+    const relEl = document.querySelector('#RelationshipDisplay');
+    const lvlEl = document.querySelector('#LevelDisplay');
+
+    if (coinEl && typeof Raccooins !== 'undefined') coinEl.innerText = Raccooins.toLocaleString() + 'RC';
+    if (relEl) relEl.innerText = RelationshipPoints.toLocaleString() + 'RP';
+    
     const CurrentLevel = GetCurrentLevel(RelationshipPoints);
-    document.querySelector('#LevelDisplay').innerText = CurrentLevel.name;
+    if (lvlEl) lvlEl.innerText = CurrentLevel.name;
+    
     checkMinigameUnlock(RelationshipPoints);
 }
 
@@ -430,26 +456,38 @@ function checkMinigameUnlock(currentRP) {
     const minigameBox = document.getElementById('minigame-box');
     const overlay = document.getElementById('minigame-overlay');
     const reqText = document.getElementById('lock-requirement');
+    const menuTitle = document.getElementById('menu-title');
 
     let requiredRP = gameLimits[currentGameIndex];
-    document.getElementById('menu-title').innerText = `${currentGameIndex + 1} / ${totalGames}`;
+    if (menuTitle) menuTitle.innerText = `${currentGameIndex + 1} / ${totalGames}`;
+
+    if (!minigameBox) return; // Védelem, ha nincs meg a doboz
 
     if (currentRP >= requiredRP) {
         minigameBox.classList.add('unlocked');
         minigameBox.classList.remove('locked');
+        if (overlay) overlay.style.display = 'none'; // Elrejtjük a lakatot, ha fel van oldva
     } else {
         minigameBox.classList.remove('unlocked');
         minigameBox.classList.add('locked');
-        reqText.innerText = `Unlocks at ${requiredRP.toLocaleString()} RP`;
+        if (overlay) overlay.style.display = 'flex'; // Megmutatjuk a lakatot
+        if (reqText) reqText.innerText = `Unlocks at ${requiredRP.toLocaleString()} RP`;
     }
 }
 
 function changeGame(direction) {
-    document.getElementById(`game-view-${currentGameIndex}`).style.display = "none";
+    const oldGame = document.getElementById(`game-view-${currentGameIndex}`);
+    if (oldGame) oldGame.style.display = "none";
+
     currentGameIndex = (currentGameIndex + direction + totalGames) % totalGames;
-    document.getElementById(`game-view-${currentGameIndex}`).style.display = "flex";
-    if (currentGameIndex === 1) initMemoryGame();
-    if (currentGameIndex === 3) nextScramble();
+
+    const newGame = document.getElementById(`game-view-${currentGameIndex}`);
+    if (newGame) newGame.style.display = "flex";
+
+    // Játékok inicializálása váltáskor, ellenőrizve hogy létezik-e a függvény:
+    if (currentGameIndex === 1 && typeof initMemoryGame === 'function') initMemoryGame();
+    if (currentGameIndex === 3 && typeof nextScramble === 'function') nextScramble();
+    
     checkMinigameUnlock(RelationshipPoints);
 }
 
