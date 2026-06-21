@@ -1019,6 +1019,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- MOBIL PANEL RESPONSIVE VEZÉRLÉS (Discord Activity / CSP kompatibilis) ---
+    document.addEventListener('DOMContentLoaded', () => {
+    const minigameBox = document.getElementById('minigame-box');
+    const shopBox = document.getElementById('shop-box');
+    const btnToggleMinigame = document.getElementById('btn-toggle-minigame');
+    const btnToggleShop = document.getElementById('btn-toggle-shop');
+    const btnCloseMinigame = document.getElementById('btn-close-minigame');
+    const btnCloseShop = document.getElementById('btn-close-shop');
+
+    if (btnToggleMinigame && minigameBox && shopBox) {
+        btnToggleMinigame.addEventListener('click', () => {
+            minigameBox.classList.toggle('mobile-open');
+            shopBox.classList.remove('mobile-open');
+        });
+    }
+
+    if (btnToggleShop && shopBox && minigameBox) {
+        btnToggleShop.addEventListener('click', () => {
+            shopBox.classList.toggle('mobile-open');
+            minigameBox.classList.remove('mobile-open');
+        });
+    }
+
+    if (btnCloseMinigame && minigameBox) {
+        btnCloseMinigame.addEventListener('click', () => {
+            minigameBox.classList.remove('mobile-open');
+        });
+    }
+
+    if (btnCloseShop && shopBox) {
+        btnCloseShop.addEventListener('click', () => {
+            shopBox.classList.remove('mobile-open');
+        });
+    }
+});
+
     // Rendszer automatikus indítása
     SetBackground();
     setInterval(SetBackground, 60 * 1000);

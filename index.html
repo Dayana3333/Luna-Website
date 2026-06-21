@@ -173,33 +173,6 @@
 
     <script src="vendor/supabase.js?v=14"></script>
     <script type="module" src="config.js?v=14"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const minigameBox = document.getElementById('minigame-box');
-            const shopBox = document.getElementById('shop-box');
-
-            // Megnyitó gombok eseménykezelői
-            document.getElementById('btn-toggle-minigame').addEventListener('click', () => {
-                minigameBox.classList.toggle('mobile-open');
-                shopBox.classList.remove('mobile-open'); // Bezárja a másikat, ha nyitva lenne
-            });
-
-            document.getElementById('btn-toggle-shop').addEventListener('click', () => {
-                shopBox.classList.toggle('mobile-open');
-                minigameBox.classList.remove('mobile-open'); // Bezárja a másikat, ha nyitva lenne
-            });
-
-            // Bezáró gombok eseménykezelői
-            document.getElementById('btn-close-minigame').addEventListener('click', () => {
-                minigameBox.classList.remove('mobile-open');
-            });
-
-            document.getElementById('btn-close-shop').addEventListener('click', () => {
-                shopBox.classList.remove('mobile-open');
-            });
-        });
-    </script>
 </body>
 
 </html>
