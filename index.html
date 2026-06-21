@@ -12,7 +12,14 @@
 </head>
 
 <body>
+    <div class="mobile-nav-bar">
+        <button class="mobile-toggle-btn" id="btn-toggle-minigame">🎮 Játékok</button>
+        <button class="mobile-toggle-btn" id="btn-toggle-shop">🛒 Bolt & Info</button>
+    </div>
+
     <div id="minigame-box" class="minigame-container locked">
+        <button class="panel-close-btn" id="btn-close-minigame">✕</button>
+        
         <div class="minigame-header">
             <button class="nav-btn" id="nav-game-prev">&lt;</button>
             <h2 id="menu-title">1 / 6</h2>
@@ -110,7 +117,9 @@
         </div>
     </div>
 
-    <div class="Shop">
+    <div id="shop-box" class="Shop">
+        <button class="panel-close-btn" id="btn-close-shop">✕</button>
+
         <div class="CoinContainer">
             <img src="imgs/raccooin.png" title="Raccooin" alt="Raccooin" id="CoinIcon">
             <div class="CoinTextContainer">10,000RC</div>
@@ -164,6 +173,33 @@
 
     <script src="vendor/supabase.js?v=14"></script>
     <script type="module" src="config.js?v=14"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const minigameBox = document.getElementById('minigame-box');
+            const shopBox = document.getElementById('shop-box');
+
+            // Megnyitó gombok eseménykezelői
+            document.getElementById('btn-toggle-minigame').addEventListener('click', () => {
+                minigameBox.classList.toggle('mobile-open');
+                shopBox.classList.remove('mobile-open'); // Bezárja a másikat, ha nyitva lenne
+            });
+
+            document.getElementById('btn-toggle-shop').addEventListener('click', () => {
+                shopBox.classList.toggle('mobile-open');
+                minigameBox.classList.remove('mobile-open'); // Bezárja a másikat, ha nyitva lenne
+            });
+
+            // Bezáró gombok eseménykezelői
+            document.getElementById('btn-close-minigame').addEventListener('click', () => {
+                minigameBox.classList.remove('mobile-open');
+            });
+
+            document.getElementById('btn-close-shop').addEventListener('click', () => {
+                shopBox.classList.remove('mobile-open');
+            });
+        });
+    </script>
 </body>
 
 </html>
