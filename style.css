@@ -889,3 +889,7 @@ body {
               display: flex !important;
         flex-direction: column !important;
     }}
+
+    body, button, .mobile-toggle-btn, .panel-close-btn, .Button, .BuyButton {
+    touch-action: manipulation !important;
+}
