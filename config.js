@@ -16,10 +16,11 @@ let currentSaveKey = null;
 
 const SUPABASE_URL = "https://borusbjllkypavkoujqk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvcnVzYmpsbGt5cGF2a291anFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzgzMzEsImV4cCI6MjA5NzU1NDMzMX0.LD1tM6qd9DdSK0SL4DGQyK0Zb-X-chgR1IokR_m2Ox4";
+
 let supabaseClient;
 
 function initSupabase() {
-    // Globális supabase objektum használata (nem az importált createClient)
+    // A globális 'supabase' objektumot használjuk az index.html-ből
     return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
@@ -32,9 +33,8 @@ const isDiscordActivity =
 let discordSdk = null;
 
 try {
-    if (isDiscordActivity) {
-        // Globális DiscordSDK objektum használata
-        discordSdk = new DiscordSDK('1088855742502678538');
+    if (isDiscordActivity && window.DiscordSDK) {
+        discordSdk = new window.DiscordSDK('1088855742502678538');
     }
 } catch (err) {
     console.warn("Discord SDK unavailable, running in web mode.", err);
