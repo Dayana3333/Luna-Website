@@ -1,4 +1,3 @@
-
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -20,7 +19,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 function initSupabase() {
-    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Globális supabase objektum használata (nem az importált createClient)
+    return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
@@ -33,6 +33,7 @@ let discordSdk = null;
 
 try {
     if (isDiscordActivity) {
+        // Globális DiscordSDK objektum használata
         discordSdk = new DiscordSDK('1088855742502678538');
     }
 } catch (err) {
