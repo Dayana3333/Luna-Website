@@ -59,8 +59,8 @@ function initSupabase() {
 supabaseClient = initSupabase();
 
 const TOKEN_EXCHANGE_URL = isDiscordActivity
-    ? `${window.location.origin}/cloudflare-api`
-    : `https://luna-token-exchange.nemethkovacsrichard.workers.dev`;
+    ? `${window.location.origin}/cloudflare-api/api/token`
+    : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/token`;
 
 let discordSdk = null;
 
