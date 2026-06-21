@@ -711,9 +711,13 @@ window.addEventListener("load", () => {
     FetchPetData();
 });
 
-// =========================================================================
-// DISCORD CSP BIZTONSÁGI ESEMÉNYKEZELŐK REGISZTRÁCIÓJA (Másold a config.js legvégére)
-// =========================================================================
+// ==========================================
+// INDÍTÁS ÉS DISCORD BIZTONSÁGI ESEMÉNYKEZELŐK
+// ==========================================
+
+SetBackground();
+setupDiscordActivity(); 
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Minigame menü léptetés
     document.getElementById('nav-game-prev')?.addEventListener('click', () => {
@@ -767,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof resetFortuneCookie === 'function') resetFortuneCookie();
     });
 
-    // 8. Lofi Rádió ki/be kapcsolás
+    // 8. Lofi Rádió ki/be kapcsolás (Javított ID: lofi-radio)
     document.getElementById('lofi-radio')?.addEventListener('click', () => {
         if (typeof toggleRadio === 'function') toggleRadio();
     });
