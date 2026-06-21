@@ -1,5 +1,9 @@
-import { createClient } from "./vendor/supabase.js";
+// Discord SDK is bundled locally as a real ES module with no external imports.
 import { DiscordSDK } from "./vendor/discord-sdk.js";
+
+// Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
+// so it's available here as window.supabase — no import needed, this avoids CSP issues.
+const { createClient } = window.supabase;
 
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
