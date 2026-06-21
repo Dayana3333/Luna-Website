@@ -1019,8 +1019,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- MOBIL PANEL RESPONSIVE VEZÉRLÉS (Discord Activity / CSP kompatibilis) ---
-    document.addEventListener('DOMContentLoaded', () => {
+    // ==========================================
+    // MOBIL PANEL RESPONSIVE VEZÉRLÉS (MODUL-KOMPATIBILIS)
+    // ==========================================
     const minigameBox = document.getElementById('minigame-box');
     const shopBox = document.getElementById('shop-box');
     const btnToggleMinigame = document.getElementById('btn-toggle-minigame');
@@ -1031,14 +1032,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnToggleMinigame && minigameBox && shopBox) {
         btnToggleMinigame.addEventListener('click', () => {
             minigameBox.classList.toggle('mobile-open');
-            shopBox.classList.remove('mobile-open');
+            shopBox.classList.remove('mobile-open'); // Bezárja a boltot, ha a játékot nyitod meg
         });
     }
 
     if (btnToggleShop && shopBox && minigameBox) {
         btnToggleShop.addEventListener('click', () => {
             shopBox.classList.toggle('mobile-open');
-            minigameBox.classList.remove('mobile-open');
+            minigameBox.classList.remove('mobile-open'); // Bezárja a játékot, ha a boltot nyitod meg
         });
     }
 
@@ -1053,7 +1054,6 @@ document.addEventListener('DOMContentLoaded', () => {
             shopBox.classList.remove('mobile-open');
         });
     }
-});
 
     // Rendszer automatikus indítása
     SetBackground();
