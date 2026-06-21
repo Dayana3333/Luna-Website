@@ -322,7 +322,7 @@ function Activity(ActionType) {
     } else if (ActionType === "Water") {
         RelationshipPoints += 150;
     } else if (ActionType === "Pet") {
-        RelationshipPoints += 350;
+        RelationshipPoints += 1;
     }
 
     UpdateUI();
