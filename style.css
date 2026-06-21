@@ -1,3 +1,21 @@
+/* fredoka-regular - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/fredoka-v17-latin-regular.woff2') format('woff2'); 
+}
+
+
+/* comfortaa-regular - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/comfortaa-v47-latin-regular.woff2') format('woff2'); 
+}
 
 :root {
   --panel-bg: linear-gradient(160deg, #3a1f0f 0%, #1a0c06 50%, #0f0804 100%);
