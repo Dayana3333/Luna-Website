@@ -161,12 +161,28 @@ async function FetchPetData() {
             .single();
 
         if (error && error.code === 'PGRST116') {
-            const { data: newPet, error: insertError } = await supabaseClient
+            const SAVE_URL = isDiscordActivity
+                ? `${window.location.origin}/cloudflare-api/api/save`
+                : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/save`;
+
+            await fetch(SAVE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    guild_id: currentSaveKey,
+                    name: 'Luna',
+                    raccooin: 100,
+                    relationship_points: 0
+                }),
+            });
+
+            const { data: newPet, error: refetchError } = await supabaseClient
                 .from('luna_data')
-                .insert([{ guild_id: currentSaveKey, name: 'Luna', raccooin: 100, relationship_points: 0 }])
-                .select()
+                .select('*')
+                .eq('guild_id', currentSaveKey)
                 .single();
-            if (insertError) throw insertError;
+
+            if (refetchError) throw refetchError;
             data = newPet;
         } else if (error) {
             throw error;
@@ -189,17 +205,24 @@ async function FetchPetData() {
 async function SavePetData() {
     if (!currentSaveKey) return;
     try {
-        const { error } = await supabaseClient
-            .from('luna_data')
-            .upsert({
+        const SAVE_URL = isDiscordActivity
+            ? `${window.location.origin}/cloudflare-api/api/save`
+            : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/save`;
+
+        const response = await fetch(SAVE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 guild_id: currentSaveKey,
                 raccooin: Raccooins,
                 relationship_points: RelationshipPoints,
                 name: document.querySelector('#PetName')?.innerText || 'Luna'
-            });
-        if (error) throw error;
+            }),
+        });
+
+        if (!response.ok) throw new Error('Save failed');
     } catch (err) {
-        console.error("Failed to save pet data:", err);
+        console.error('Failed to save pet data:', err);
     }
 }
 
