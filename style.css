@@ -594,7 +594,6 @@ body {
   flex-direction: column !important;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
   gap: 2px;
 }
 
@@ -604,6 +603,13 @@ body {
   opacity: 0.85;
   letter-spacing: 0.5px;
   line-height: 1;
+}
+
+#cookie-reset-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+  justify-content: center;
 }
 
 
