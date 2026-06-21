@@ -1,5 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
+
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -21,7 +22,6 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 function initSupabase() {
-    // Közvetlenül inicializáljuk az importált createClient-tel, elkerülve a 'supabase is not defined' hibát
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
@@ -40,6 +40,7 @@ try {
 } catch (err) {
     console.warn("Discord SDK unavailable, running in web mode.", err);
 }
+
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
@@ -62,9 +63,7 @@ async function setupDiscordActivity() {
         });
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
         
-        // Frissítjük a Discord Rich Presence státuszt az érvényes asset névvel
         await updateDiscordPresence();
-
         FetchPetData();
     } catch (error) {
         console.error("Discord Activity error:", error);
@@ -73,12 +72,11 @@ async function setupDiscordActivity() {
     }
 }
 
-// A státusz frissítése a helyes háttérképpel és névvel
 async function updateDiscordPresence() {
     try {
         await discordSdk.commands.setActivity({
             activity: {
-                type: 0, // 0 = Playing (Játszik)
+                type: 0, 
                 details: "Chilling with Luna 🦝",
                 state: "Virtual Pet Activity",
                 assets: {
@@ -150,17 +148,6 @@ async function SavePetData() {
 }
 
 // ==========================================
-// NÉVVÁLTOZTATÁS MENTÉSE
-// ==========================================
-
-document.querySelector('#PetName').addEventListener('blur', () => {
-    const NewName = document.querySelector('#PetName').textContent.trim();
-    if (NewName && currentSaveKey) {
-        SavePetData();
-    }
-});
-
-// ==========================================
 // RELATIONSHIP SZINTEK
 // ==========================================
 
@@ -211,14 +198,12 @@ let MinigameCooldownTimer = null;
 
 let currentGameIndex = 0;
 const totalGames = 6;
-const gameLimits = [5000, 100, 200, 300, 400, 500];
+const gameLimits = [0, 100, 200, 300, 400, 500]; // 0 RP-nél nyílik a Tic-Tac-Toe
 const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scramble", "Cookie Catcher", "Fortune Cookie Cracker"];
-
 
 // ==========================================
 // HÁTTÉR (NAP/ÉJ CIKLUS)
 // ==========================================
-
 
 const DayBackgrounds = [
     "url('imgs/daylight_wp_1.jpg')",
@@ -229,7 +214,6 @@ const NightBackgrounds = [
     "url('imgs/night_wp_1.jpg')",
     "url('imgs/night_wp_2.jpg')"
 ];
-
 
 function SetBackground() {
     const Hour = new Date().getHours();
@@ -287,16 +271,20 @@ function ResetSleepTimer() {
     if (ActivityTimer) return;
 
     SleepTimer = setTimeout(() => {
-        Raccoon.src = 'imgs/sleep_raccoon.png';
-        Raccoon.classList.remove('pet-idle');
+        if (Raccoon) {
+            Raccoon.src = 'imgs/sleep_raccoon.png';
+            Raccoon.classList.remove('pet-idle');
+        }
     }, SleepDelay);
 }
 
 function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
-    Raccoon.src = 'imgs/raccoon.png';
-    Raccoon.classList.add('pet-idle');
+    if (Raccoon) {
+        Raccoon.src = 'imgs/raccoon.png';
+        Raccoon.classList.add('pet-idle');
+    }
 }
 
 // ==========================================
@@ -305,14 +293,18 @@ function WakeUp() {
 
 function PlayAnimation(Source, CssClass, DurationMS = 2000) {
     WakeUp();
-    Raccoon.src = Source;
-    Raccoon.classList.remove('pet-idle');
-    if (CssClass) Raccoon.classList.add(CssClass);
+    if (Raccoon) {
+        Raccoon.src = Source;
+        Raccoon.classList.remove('pet-idle');
+        if (CssClass) Raccoon.classList.add(CssClass);
+    }
 
     ActivityTimer = setTimeout(() => {
-        Raccoon.src = 'imgs/raccoon.png';
-        if (CssClass) Raccoon.classList.remove(CssClass);
-        Raccoon.classList.add('pet-idle');
+        if (Raccoon) {
+            Raccoon.src = 'imgs/raccoon.png';
+            if (CssClass) Raccoon.classList.remove(CssClass);
+            Raccoon.classList.add('pet-idle');
+        }
         ActivityTimer = null;
         ResetSleepTimer();
     }, DurationMS);
@@ -320,6 +312,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
 function Activity(ActionType) {
     const now = Date.now();
+
     if ((ActionType === "Feed" || ActionType === "Water") && ActivityCooldowns[ActionType] > now) return;
 
     if (!currentSaveKey) return;
@@ -354,6 +347,7 @@ function Activity(ActionType) {
             setTimeout(() => { Btn.classList.remove('cooldown'); }, 30000);
         }
     }
+
     SavePetData();
 }
 
@@ -371,15 +365,19 @@ function toggleRadio() {
     if (!isPlaying) {
         player.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[15]}', '*');
         player.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        radioImg.classList.add('radio-playing');
-        statusText.innerText = "🎵 Lofi ON";
-        statusText.style.color = "#00FF00";
+        if (radioImg) radioImg.classList.add('radio-playing');
+        if (statusText) {
+            statusText.innerText = "🎵 Lofi ON";
+            statusText.style.color = "#00FF00";
+        }
         isPlaying = true;
     } else {
         player.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        radioImg.classList.remove('radio-playing');
-        statusText.innerText = "OFF";
-        statusText.style.color = "#4a3e3d";
+        if (radioImg) radioImg.classList.remove('radio-playing');
+        if (statusText) {
+            statusText.innerText = "OFF";
+            statusText.style.color = "#4a3e3d";
+        }
         isPlaying = false;
     }
 }
@@ -416,10 +414,16 @@ function TriggerLunaJoy() {
 // ==========================================
 
 function UpdateUI() {
-    document.querySelector('.CoinTextContainer').innerText = Raccooins.toLocaleString() + 'RC';
-    document.querySelector('#RelationshipDisplay').innerText = RelationshipPoints.toLocaleString() + 'RP';
+    const coinEl = document.querySelector('.CoinTextContainer');
+    const relEl = document.querySelector('#RelationshipDisplay');
+    const lvlEl = document.querySelector('#LevelDisplay');
+
+    if (coinEl) coinEl.innerText = Raccooins.toLocaleString() + 'RC';
+    if (relEl) relEl.innerText = RelationshipPoints.toLocaleString() + 'RP';
+    
     const CurrentLevel = GetCurrentLevel(RelationshipPoints);
-    document.querySelector('#LevelDisplay').innerText = CurrentLevel.name;
+    if (lvlEl) lvlEl.innerText = CurrentLevel.name;
+    
     checkMinigameUnlock(RelationshipPoints);
 }
 
@@ -431,29 +435,38 @@ function checkMinigameUnlock(currentRP) {
     const minigameBox = document.getElementById('minigame-box');
     const overlay = document.getElementById('minigame-overlay');
     const reqText = document.getElementById('lock-requirement');
+    const menuTitle = document.getElementById('menu-title');
 
     let requiredRP = gameLimits[currentGameIndex];
-    document.getElementById('menu-title').innerText = `${currentGameIndex + 1} / ${totalGames}`;
+    if (menuTitle) menuTitle.innerText = `${currentGameIndex + 1} / ${totalGames}`;
+
+    if (!minigameBox) return;
 
     if (currentRP >= requiredRP) {
         minigameBox.classList.add('unlocked');
         minigameBox.classList.remove('locked');
+        if (overlay) overlay.style.display = 'none';
     } else {
         minigameBox.classList.remove('unlocked');
         minigameBox.classList.add('locked');
-        reqText.innerText = `Unlocks at ${requiredRP.toLocaleString()} RP`;
+        if (overlay) overlay.style.display = 'flex';
+        if (reqText) reqText.innerText = `Unlocks at ${requiredRP.toLocaleString()} RP`;
     }
 }
 
 function changeGame(direction) {
-    document.getElementById(`game-view-${currentGameIndex}`).style.display = "none";
-    currentGameIndex = (currentGameIndex + direction + totalGames) % totalGames;
-    document.getElementById(`game-view-${currentGameIndex}`).style.display = "flex";
+    const oldGame = document.getElementById(`game-view-${currentGameIndex}`);
+    if (oldGame) oldGame.style.display = "none";
 
-    if (currentGameIndex === 1) initMemoryGame();
-    if (currentGameIndex === 3) nextScramble();
+    currentGameIndex = (currentGameIndex + direction + totalGames) % totalGames;
+
+    const newGame = document.getElementById(`game-view-${currentGameIndex}`);
+    if (newGame) newGame.style.display = "flex";
+
+    if (currentGameIndex === 1 && typeof initMemoryGame === 'function') initMemoryGame();
+    if (currentGameIndex === 3 && typeof nextScramble === 'function') nextScramble();
     checkMinigameUnlock(RelationshipPoints);
-} 
+}
 
 // ---- 1. TIC-TAC-TOE ----
 
@@ -578,6 +591,7 @@ function startSushiGame() {
 
 function moveSushi() {
     const target = document.getElementById('sushi-target');
+    if (!target) return;
     target.innerText = goodFoods[Math.floor(Math.random() * goodFoods.length)];
     target.style.left = Math.floor(Math.random() * 160) + "px";
     target.style.top = Math.floor(Math.random() * 160) + "px";
@@ -639,31 +653,21 @@ if (catcherZone && catcherBasket) {
 
 function startCatcherGame() {
     if (isCatcherActive) return;
-    if (typeof WakeUp === 'function') WakeUp();
-    
+    WakeUp();
     isCatcherActive = true;
     catcherScore = 0;
     catcherTimer = 20;
-    
     if (catcherStartBtn) catcherStartBtn.style.display = 'none';
     if (catcherStatus) catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
     
-    // Biztonságosan töröljük az esetlegesen beragadt korábbi időzítőket
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
     
     catcherInterval = setInterval(spawnCatcherItem, 500);
-    
     catcherCountdown = setInterval(() => {
         catcherTimer--;
-        
-        if (catcherStatus) {
-            catcherStatus.innerText = `Score: ${catcherScore} | Time: ${catcherTimer}s`;
-        }
-        
-        if (catcherTimer <= 0) {
-            endCatcherGame();
-        }
+        if (catcherStatus) catcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
+        if (catcherTimer <= 0) endCatcherGame();
     }, 1000);
 }
 
@@ -695,7 +699,6 @@ function spawnCatcherItem() {
         const basketLeft = parseFloat(catcherBasket.style.left) || 0;
         const zoneHeight = rect.height;
 
-        // Ütközés figyelése (kosár magassága)
         if (itemTop >= zoneHeight - 40 && itemTop <= zoneHeight - 10) {
             if (randomX >= basketLeft - 15 && randomX <= basketLeft + 30) {
                 catcherScore++;
@@ -716,32 +719,26 @@ function spawnCatcherItem() {
 
 function endCatcherGame() {
     isCatcherActive = false;
-    
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-    catcherInterval = null;
-    catcherCountdown = null;
     
-    // Süti maradványok takarítása
     document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
     
     const prizeRC = Math.floor(catcherScore * 5); 
     const prizeRP = Math.floor(catcherScore * 2); 
     
-    // Globális változók frissítése (ha léteznek)
-    if (typeof Raccooins !== 'undefined') Raccooins += prizeRC;
-    if (typeof RelationshipPoints !== 'undefined') RelationshipPoints += prizeRP;
+    Raccooins += prizeRC;
+    RelationshipPoints += prizeRP;
     
     if (catcherStatus) {
         catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
     }
-    
     if (catcherStartBtn) {
         catcherStartBtn.style.display = 'inline-block';
     }
     
-    if (typeof UpdateUI === 'function') UpdateUI();
-    if (typeof SavePetData === 'function') SavePetData();
+    UpdateUI();
+    SavePetData();
 }
 
 // ---- 6. FORTUNE COOKIE ----
@@ -768,23 +765,25 @@ function clickFortuneCookie() {
     const statusEl = document.getElementById('cookie-status');
     const textEl = document.getElementById('cookie-fortune-text');
     const resetBtn = document.getElementById('cookie-reset-btn');
-    statusEl.innerText = `Cracks: ${cookieClicks} / ${targetClicks}`;
+    if (statusEl) statusEl.innerText = `Cracks: ${cookieClicks} / ${targetClicks}`;
     if (cookieClicks >= targetClicks) {
         isCookieCracked = true;
-        cookieEl.innerText = "💥";
-        cookieEl.classList.add('cookie-cracked');
+        if (cookieEl) {
+            cookieEl.innerText = "💥";
+            cookieEl.classList.add('cookie-cracked');
+        }
         setTimeout(() => {
-            cookieEl.innerText = "📜";
-            statusEl.innerText = "🥠 Cookie cracked!";
+            if (cookieEl) cookieEl.innerText = "📜";
+            if (statusEl) statusEl.innerText = "🥠 Cookie cracked!";
             const randomFortune = fortuneMessages[Math.floor(Math.random() * fortuneMessages.length)];
-            textEl.innerText = `"${randomFortune}"`;
+            if (textEl) textEl.innerText = `"${randomFortune}"`;
             const prizeRC = Math.floor(Math.random() * 51) + 30;
             const prizeRP = Math.floor(Math.random() * 31) + 20;
             Raccooins += prizeRC;
             RelationshipPoints += prizeRP;
             UpdateUI();
             SavePetData();
-            resetBtn.style.display = 'inline-block';
+            if (resetBtn) resetBtn.style.display = 'inline-block';
         }, 400);
     }
 }
@@ -800,10 +799,18 @@ function resetFortuneCookie() {
 }
 
 // ==========================================
-// ESEMÉNYKEZELŐK REGISZTRÁCIÓJA
+// INDÍTÁS ÉS BIZTONSÁGI ESEMÉNYKEZELŐK
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Pet név mentése blur esetén (Biztonságos betöltés)
+    document.querySelector('#PetName')?.addEventListener('blur', () => {
+        const NewName = document.querySelector('#PetName').textContent.trim();
+        if (NewName && currentSaveKey) {
+            SavePetData();
+        }
+    });
+
     // 1. Minigame menü léptetés
     document.getElementById('nav-game-prev')?.addEventListener('click', () => {
         if (typeof changeGame === 'function') changeGame(-1);
@@ -856,7 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof resetFortuneCookie === 'function') resetFortuneCookie();
     });
 
-    // 8. Lofi Rádió ki/be kapcsolás (Javított ID: lofi-radio)
+    // 8. Lofi Rádió ki/be kapcsolás
     document.getElementById('lofi-radio')?.addEventListener('click', () => {
         if (typeof toggleRadio === 'function') toggleRadio();
     });
@@ -881,13 +888,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Rendszer automatikus indítása
+    SetBackground();
+    setInterval(SetBackground, 60 * 1000);
+    ResetSleepTimer();
+    setupDiscordActivity();
 });
-
-// ==========================================
-// INDÍTÁS
-// ==========================================
-
-SetBackground();
-setInterval(SetBackground, 60 * 1000);
-ResetSleepTimer();
-setupDiscordActivity();
