@@ -324,7 +324,7 @@ function startCooldown(btnId, durationMs, labelText) {
 
 let currentGameIndex = 0;
 const totalGames = 6;
-const gameLimits = [100, 200, 300, 400, 500, 600]; // 0 RP-nél nyílik a Tic-Tac-Toe
+const gameLimits = [100, 200, 300, 400, 500, 600, 50]; // 0 RP-nél nyílik a Tic-Tac-Toe
 const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scramble", "Cookie Catcher", "Fortune Cookie Cracker"];
 
 // ==========================================
