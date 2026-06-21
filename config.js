@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-import { DiscordSDK } from '@discord/embedded-app-sdk'
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
 
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
@@ -19,11 +19,9 @@ let currentSaveKey = null;
 
 const SUPABASE_URL = "https://borusbjllkypavkoujqk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvcnVzYmpsbGt5cGF2a291anFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzgzMzEsImV4cCI6MjA5NzU1NDMzMX0.LD1tM6qd9DdSK0SL4DGQyK0Zb-X-chgR1IokR_m2Ox4";
-
 let supabaseClient;
 
 function initSupabase() {
-    // A globális 'supabase' objektumot használjuk az index.html-ből
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
@@ -37,8 +35,8 @@ let discordSdk = null;
 
 try {
     if (isDiscordActivity) {
-    discordSdk = new DiscordSDK('1088855742502678538');
-}
+        discordSdk = new DiscordSDK('1088855742502678538');
+    }
 } catch (err) {
     console.warn("Discord SDK unavailable, running in web mode.", err);
 }
