@@ -1,6 +1,6 @@
 (async () => {
     try {
-        const module = await import("https://esm.sh/@discord/embedded-app-sdk");
+        const module = await import("./vendor/discord-sdk.js");
         window.DiscordSDK = module.DiscordSDK;
         console.log("Discord SDK loaded");
     } catch (error) {

@@ -1,5 +1,5 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
+import { createClient } from "./vendor/supabase.js";
+import { DiscordSDK } from "./vendor/discord-sdk.js";
 
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
