@@ -45,7 +45,7 @@ const isDiscordActivity =
 if (isDiscordActivity) {
     patchUrlMappings([
         { prefix: "/supabase-api", target: "borusbjllkypavkoujqk.supabase.co" },
-        { prefix: "/kranem-api", target: "intel0.kranem.hu:25692" },
+        { prefix: "/cloudflare-api", target: "luna-token-exchange.nemethkovacsrichard.workers.dev" },
     ]);
 }
 
@@ -58,7 +58,9 @@ function initSupabase() {
 
 supabaseClient = initSupabase();
 
-const TOKEN_EXCHANGE_URL = "https://luna-token-exchange.yourname.workers.dev";
+const TOKEN_EXCHANGE_URL = isDiscordActivity
+    ? `${window.location.origin}/cloudflare-api`
+    : `https://luna-token-exchange.nemethkovacsrichard.workers.dev`;
 
 let discordSdk = null;
 
