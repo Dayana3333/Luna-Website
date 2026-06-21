@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK } from "./vendor/discord-sdk.js";
+import { DiscordSDK, patchUrlMappings } from "./vendor/discord-sdk.js";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -25,15 +25,30 @@ const SUPABASE_URL = "https://borusbjllkypavkoujqk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvcnVzYmpsbGt5cGF2a291anFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzgzMzEsImV4cCI6MjA5NzU1NDMzMX0.LD1tM6qd9DdSK0SL4DGQyK0Zb-X-chgR1IokR_m2Ox4";
 let supabaseClient;
 
-function initSupabase() {
-    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-
-supabaseClient = initSupabase();
-
 const isDiscordActivity =
     window.location.search.includes("frame_id=") ||
     window.location.search.includes("instance_id=");
+
+// Inside Discord, all network requests must go through Discord's proxy
+// (discordsays.com) instead of hitting external domains directly — that's
+// what the CSP "connect-src" error was about. patchUrlMappings rewrites
+// fetch() calls under the hood so the Supabase client code below doesn't
+// need to change at all; it just needs to be told to use a relative path
+// instead of the real Supabase URL when running as an Activity.
+if (isDiscordActivity) {
+    patchUrlMappings([
+        { prefix: "/supabase-api", target: "borusbjllkypavkoujqk.supabase.co" },
+    ]);
+}
+
+function initSupabase() {
+    const url = isDiscordActivity
+        ? `${window.location.origin}/supabase-api`
+        : SUPABASE_URL;
+    return createClient(url, SUPABASE_ANON_KEY);
+}
+
+supabaseClient = initSupabase();
 
 let discordSdk = null;
 
