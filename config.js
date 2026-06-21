@@ -16,6 +16,7 @@ let PetData = null;
 let Raccooins = 100;
 let RelationshipPoints = 0;
 let currentSaveKey = null;
+let isSaving = false;
 
 // ==========================================
 // SUPABASE & DISCORD SDK KONFIGURÁCIÓ
@@ -78,21 +79,21 @@ try {
 
 async function setupDiscordActivity() {
     const startPolling = () => {
-        setInterval(async () => {
-            if (!currentSaveKey) return;
-            const { data, error } = await supabaseClient
-                .from('luna_data')
-                .select('*')
-                .eq('guild_id', currentSaveKey)
-                .single();
-            if (error || !data) return;
-            Raccooins = data.raccooin || 100;
-            RelationshipPoints = data.relationship_points || 0;
-            const petNameEl = document.querySelector('#PetName');
-            if (petNameEl) petNameEl.innerText = data.name;
-            UpdateUI();
-        }, 5000);
-    };
+    setInterval(async () => {
+        if (!currentSaveKey || isSaving) return;
+        const { data, error } = await supabaseClient
+            .from('luna_data')
+            .select('*')
+            .eq('guild_id', currentSaveKey)
+            .single();
+        if (error || !data) return;
+        Raccooins = data.raccooin || 100;
+        RelationshipPoints = data.relationship_points || 0;
+        const petNameEl = document.querySelector('#PetName');
+        if (petNameEl) petNameEl.innerText = data.name;
+        UpdateUI();
+    }, 5000);
+};
 
     if (!discordSdk) {
         console.log("Local mode — no Discord SDK.");
@@ -211,6 +212,7 @@ async function FetchPetData() {
 
 async function SavePetData() {
     if (!currentSaveKey) return;
+    isSaving = true;
     try {
         const SAVE_URL = isDiscordActivity
             ? `${window.location.origin}/cloudflare-api/api/save`
@@ -230,6 +232,8 @@ async function SavePetData() {
         if (!response.ok) throw new Error('Save failed');
     } catch (err) {
         console.error('Failed to save pet data:', err);
+    } finally {
+        isSaving = false;
     }
 }
 
