@@ -211,7 +211,7 @@ let MinigameCooldownTimer = null;
 
 let currentGameIndex = 0;
 const totalGames = 6;
-const gameLimits = [5000, 5000, 5000, 5000, 5000, 5000];
+const gameLimits = [5000, 100, 200, 300, 400, 500];
 const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scramble", "Cookie Catcher", "Fortune Cookie Cracker"];
 
 // ==========================================
