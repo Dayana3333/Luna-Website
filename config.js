@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js'
+import { DiscordSDK } from '@discord/embedded-app-sdk'
+
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -21,7 +24,7 @@ let supabaseClient;
 
 function initSupabase() {
     // A globális 'supabase' objektumot használjuk az index.html-ből
-    return supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
@@ -33,9 +36,9 @@ const isDiscordActivity =
 let discordSdk = null;
 
 try {
-    if (isDiscordActivity && window.DiscordSDK) {
-        discordSdk = new window.DiscordSDK('1088855742502678538');
-    }
+    if (isDiscordActivity) {
+    discordSdk = new DiscordSDK('1088855742502678538');
+}
 } catch (err) {
     console.warn("Discord SDK unavailable, running in web mode.", err);
 }

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@discord/embedded-app-sdk": "^2.5.0",
+    "@supabase/supabase-js": "^2.108.2"
+  }
+}
