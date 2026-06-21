@@ -815,17 +815,9 @@ function resetFortuneCookie() {
     document.getElementById('cookie-reset-btn').style.display = 'none';
 }
 
-window.addEventListener("load", () => {
-    setupDiscordActivity();
-    FetchPetData();
-});
-
 // ==========================================
-// INDÍTÁS ÉS DISCORD BIZTONSÁGI ESEMÉNYKEZELŐK
+// ESEMÉNYKEZELŐK REGISZTRÁCIÓJA
 // ==========================================
-
-SetBackground();
-setupDiscordActivity(); 
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Minigame menü léptetés
@@ -878,11 +870,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('cookie-reset-btn')?.addEventListener('click', () => {
         if (typeof resetFortuneCookie === 'function') resetFortuneCookie();
-    });
-
-    // ---- Cookie Catcher Start Gomb ----
-    document.getElementById('catcher-start-btn')?.addEventListener('click', () => {
-        if (typeof startCatcherGame === 'function') startCatcherGame();
     });
 
     // 8. Lofi Rádió ki/be kapcsolás (Javított ID: lofi-radio)
