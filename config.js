@@ -706,14 +706,6 @@ function resetFortuneCookie() {
     document.getElementById('cookie-reset-btn').style.display = 'none';
 }
 
-// ==========================================
-// INDÍTÁS
-// ==========================================
-
-SetBackground();
-setInterval(SetBackground, 60 * 1000);
-ResetSleepTimer();
-
 window.addEventListener("load", () => {
     setupDiscordActivity();
     FetchPetData();
@@ -801,3 +793,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// ==========================================
+// INDÍTÁS
+// ==========================================
+
+SetBackground();
+setInterval(SetBackground, 60 * 1000);
+ResetSleepTimer();
+setupDiscordActivity();

@@ -4,7 +4,7 @@
   font-family: 'Fredoka';
   font-style: normal;
   font-weight: 400;
-  src: url('../fonts/fredoka-v17-latin-regular.woff2') format('woff2'); 
+  src: url('./fonts/fredoka-v17-latin-regular.woff2') format('woff2'); 
 }
 
 
@@ -14,7 +14,7 @@
   font-family: 'Comfortaa';
   font-style: normal;
   font-weight: 400;
-  src: url('../fonts/comfortaa-v47-latin-regular.woff2') format('woff2'); 
+  src: url('./fonts/comfortaa-v47-latin-regular.woff2') format('woff2'); 
 }
 
 :root {
