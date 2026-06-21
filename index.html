@@ -45,15 +45,15 @@
 
             <div class="game-view" id="game-view-1" style="display: none;">
                 <h3 class="game-title">Luna Memory Match</h3>
-                <p class="game-status" id="memory-status">Find the pairs! Clicks: 0</p>
-                <div class="memory-grid" id="memory-grid"></div>
+                <p class="game-status" id="memory-status">Find the pairs!</p>
+                <div class="memory-board" id="memory-grid"></div>
                 <button class="game-btn" id="memory-restart-btn">Restart</button>
             </div>
 
             <div class="game-view" id="game-view-2" style="display: none;">
                 <h3 class="game-title">Sushi Tap</h3>
                 <p class="game-status" id="sushi-status">Score: 0 | Time: 15s</p>
-                <div class="sushi-game-area">
+                <div class="sushi-area" id="sushi-tap-zone">
                     <div id="sushi-target">🍣</div>
                 </div>
                 <button class="game-btn" id="sushi-start-btn">Start Game</button>
@@ -61,62 +61,62 @@
 
             <div class="game-view" id="game-view-3" style="display: none;">
                 <h3 class="game-title">Word Scramble</h3>
-                <p class="game-status" id="scramble-status">Guess the word!</p>
-                <div class="scramble-box">
-                    <div id="scrambled-word" class="scrambled-text">LUNA</div>
-                    <input type="text" id="scramble-input" placeholder="Your guess..." autocomplete="off">
+                <p class="game-status" id="scramble-status">Unscramble the word!</p>
+                <div class="scramble-container">
+                    <div id="scrambled-word">LUNA</div>
+                    <input type="text" id="scramble-input" placeholder="Your guess...">
                     <button class="game-btn" id="scramble-submit-btn">Submit</button>
                 </div>
             </div>
 
             <div class="game-view" id="game-view-4" style="display: none;">
                 <h3 class="game-title">Cookie Catcher</h3>
-                <p class="game-status" id="catcher-status">Score: 0 | Time: 15s</p>
+                <p class="game-status" id="catcher-status">Move your cursor! Time: 20s</p>
                 <div class="catcher-area" id="catcher-zone">
-                    <div id="catcher-basket">🧺</div>
+                    <div id="catcher-basket">🥣</div>
                 </div>
                 <button class="game-btn" id="catcher-start-btn">Start Game</button>
             </div>
 
             <div class="game-view" id="game-view-5" style="display: none;">
                 <h3 class="game-title">Fortune Cookie</h3>
-                <p class="game-status" id="cookie-status">Click the Cookie to break it</p>
+                <p class="game-status" id="cookie-status">Click the Fortune Cookie to break it!</p>
                 <div class="cookie-click-zone">
                     <div id="fortune-cookie-target">🥠</div>
-                    <div id="cookie-fortune-text" class="fortune-text"></div>
                 </div>
+                <div id="cookie-fortune-text"></div>
                 <button class="game-btn" id="cookie-reset-btn" style="display: none;">New Cookie</button>
             </div>
 
         </div>
     </div>
 
-    <div class="MusicContainer">
+    <div class="radio-container">
         <img id="lofi-radio" src="imgs/radio.png" alt="Lofi Radio">
-        <div id="RadioStatus">Radio: OFF</div>
+        <span id="radio-status">OFF</span>
     </div>
 
-    <div class="MainContainer">
-        <div class="CurrencyDisplay">
-            <img src="imgs/raccooin.png" alt="RC" class="CurrencyIcon">
-            <span id="CurrencyValue">100 RC</span>
+    <div class="PetArea">
+        <h1 contenteditable="true" spellcheck="false" id="PetName">Luna</h1>
+
+        <div class="pet pet-idle">
+            <img src="imgs/raccoon.png" id="Raccoon" alt="Raccoon">
         </div>
 
-        <div class="PetArea">
-            <div id="PetName">Luna</div>
-            <div class="RaccoonContainer">
-                <img src="imgs/raccoon.png" alt="Luna" id="Raccoon">
-                <div id="speech-bubble" class="speech-bubble" style="display: none;"></div>
-            </div>
-        </div>
-
-        <div class="ActionContainer">
+        <div class="Buttons">
             <button class="Button" id="FeedButton" data-activity="Feed">🍜 Feed</button>
             <button class="Button" id="WaterButton" data-activity="Water">💧 Water</button>
             <button class="Button" data-activity="Pet">❤️ Pet</button>
         </div>
+    </div>
 
-        <div class="ShopContainer">
+    <div class="Shop">
+        <div class="CoinContainer">
+            <img src="imgs/raccooin.png" title="Raccooin" alt="Raccooin" id="CoinIcon">
+            <div class="CoinTextContainer">10,000RC</div>
+        </div>
+
+        <div class="ItemsContainer">
             <div class="ItemCard">
                 <div class="ItemPreview">
                     <img src="imgs/bubble-tea.png" title="Bubble Tea" alt="Bubble Tea" class="ItemImage">

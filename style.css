@@ -588,7 +588,7 @@ body {
 
 .cooldown {
   filter: grayscale(100%) brightness(0.6);
-  cursor: not-allowed !important;
+  cursor: not-allowed !allowed;
   pointer-events: none;
 }
 
