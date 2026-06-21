@@ -613,8 +613,7 @@ function checkScrambleGuess() {
     }
 }
 
-
-// ---- 5. COOKIE CATCHER JÁTÉK LOGIKA ----
+// ---- 5. COOKIE CATCHER ----
 
 let catcherScore = 0;
 let isCatcherActive = false;
@@ -627,7 +626,6 @@ const catcherBasket = document.getElementById('catcher-basket');
 const catcherStatus = document.getElementById('catcher-status');
 const catcherStartBtn = document.getElementById('catcher-start-btn');
 
-// Egérmozgás követése
 if (catcherZone && catcherBasket) {
     catcherZone.addEventListener('mousemove', (e) => {
         if (!isCatcherActive) return;
@@ -639,40 +637,46 @@ if (catcherZone && catcherBasket) {
     });
 }
 
-// Játék indítása
 function startCatcherGame() {
     if (isCatcherActive) return;
     if (typeof WakeUp === 'function') WakeUp();
-        
+    
     isCatcherActive = true;
     catcherScore = 0;
     catcherTimer = 20;
-        
+    
     if (catcherStartBtn) catcherStartBtn.style.display = 'none';
     if (catcherStatus) catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
-        
+    
+    // Biztonságosan töröljük az esetlegesen beragadt korábbi időzítőket
+    clearInterval(catcherInterval);
+    clearInterval(catcherCountdown);
+    
     catcherInterval = setInterval(spawnCatcherItem, 500);
-        
+    
     catcherCountdown = setInterval(() => {
         catcherTimer--;
+        
         if (catcherStatus) {
-                atcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
+            catcherStatus.innerText = `Score: ${catcherScore} | Time: ${catcherTimer}s`;
         }
-        if (catcherTimer <= 0) endCatcherGame();
+        
+        if (catcherTimer <= 0) {
+            endCatcherGame();
+        }
     }, 1000);
 }
 
-// Sütik generálása és zuhanása
 function spawnCatcherItem() {
     if (!isCatcherActive || !catcherZone) return;
 
     const item = document.createElement('div');
     item.classList.add('falling-cookie');
     item.innerText = '🍪'; 
-        
+    
     const rect = catcherZone.getBoundingClientRect();
     const randomX = Math.floor(Math.random() * (rect.width - 25));
-        
+    
     item.style.left = randomX + 'px';
     item.style.top = '0px';
     catcherZone.appendChild(item);
@@ -691,7 +695,7 @@ function spawnCatcherItem() {
         const basketLeft = parseFloat(catcherBasket.style.left) || 0;
         const zoneHeight = rect.height;
 
-        // Ütközés figyelése (ha eléri a kosár magasságát)
+        // Ütközés figyelése (kosár magassága)
         if (itemTop >= zoneHeight - 40 && itemTop <= zoneHeight - 10) {
             if (randomX >= basketLeft - 15 && randomX <= basketLeft + 30) {
                 catcherScore++;
@@ -710,34 +714,35 @@ function spawnCatcherItem() {
     }, 30);
 }
 
-// Játék leállítása és pontok kiosztása
 function endCatcherGame() {
     isCatcherActive = false;
+    
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-        
+    catcherInterval = null;
+    catcherCountdown = null;
+    
+    // Süti maradványok takarítása
     document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
-        
+    
     const prizeRC = Math.floor(catcherScore * 5); 
     const prizeRP = Math.floor(catcherScore * 2); 
-        
+    
+    // Globális változók frissítése (ha léteznek)
     if (typeof Raccooins !== 'undefined') Raccooins += prizeRC;
     if (typeof RelationshipPoints !== 'undefined') RelationshipPoints += prizeRP;
-        
+    
     if (catcherStatus) {
         catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
     }
-        
+    
     if (catcherStartBtn) {
         catcherStartBtn.style.display = 'inline-block';
     }
-        
+    
     if (typeof UpdateUI === 'function') UpdateUI();
     if (typeof SavePetData === 'function') SavePetData();
 }
-
-// Eseménykezelő hozzárendelése a gombhoz
-catcherStartBtn?.addEventListener('click', startCatcherGame);
 
 // ---- 6. FORTUNE COOKIE ----
 
