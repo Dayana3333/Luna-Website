@@ -1,5 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { DiscordSDK } from "https://esm.sh/@discord/embedded-app-sdk";
+
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
 // ==========================================
@@ -12,6 +13,17 @@ let Raccooins = 100;
 let RelationshipPoints = 0;
 let currentSaveKey = null;
 
+// IDŐZÍTŐK & COOLDOWN VÁLTOZÓK
+let ActivityTimer = null;
+let SleepTimer = null;
+const SleepDelay = 5 * 60 * 1000; // 5 perc alvásig
+let isPlaying = false;
+
+const ActivityCooldowns = {
+    Feed: 0,
+    Water: 0
+};
+
 // ==========================================
 // SUPABASE & DISCORD SDK KONFIGURÁCIÓ
 // ==========================================
@@ -21,7 +33,6 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 function initSupabase() {
-    // Közvetlenül inicializáljuk az importált createClient-tel, elkerülve a 'supabase is not defined' hibát
     return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
@@ -40,6 +51,7 @@ try {
 } catch (err) {
     console.warn("Discord SDK unavailable, running in web mode.", err);
 }
+
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
@@ -62,9 +74,7 @@ async function setupDiscordActivity() {
         });
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
         
-        // Frissítjük a Discord Rich Presence státuszt az érvényes asset névvel
         await updateDiscordPresence();
-
         FetchPetData();
     } catch (error) {
         console.error("Discord Activity error:", error);
@@ -73,12 +83,11 @@ async function setupDiscordActivity() {
     }
 }
 
-// A státusz frissítése a helyes háttérképpel és névvel
 async function updateDiscordPresence() {
     try {
         await discordSdk.commands.setActivity({
             activity: {
-                type: 0, // 0 = Playing (Játszik)
+                type: 0, 
                 details: "Chilling with Luna 🦝",
                 state: "Virtual Pet Activity",
                 assets: {
@@ -125,7 +134,7 @@ async function FetchPetData() {
         const petNameEl = document.querySelector('#PetName');
         if (petNameEl) petNameEl.innerText = data.name;
 
-        UpdateUI();
+        if (typeof UpdateUI === 'function') UpdateUI();
         console.log("Pet data loaded:", PetData);
     } catch (err) {
         console.error("Failed to load pet data:", err);
@@ -148,17 +157,6 @@ async function SavePetData() {
         console.error("Failed to save pet data:", err);
     }
 }
-
-// ==========================================
-// NÉVVÁLTOZTATÁS MENTÉSE
-// ==========================================
-
-document.querySelector('#PetName').addEventListener('blur', () => {
-    const NewName = document.querySelector('#PetName').textContent.trim();
-    if (NewName && currentSaveKey) {
-        SavePetData();
-    }
-});
 
 // ==========================================
 // RELATIONSHIP SZINTEK
@@ -186,20 +184,6 @@ function GetCurrentLevel(points) {
     }
     return CurrentLevel;
 }
-
-// ==========================================
-// IDŐZÍTŐK & COOLDOWN
-// ==========================================
-
-let ActivityTimer = null;
-let SleepTimer = null;
-const SleepDelay = 5 * 60 * 1000;
-let isPlaying = false;
-
-const ActivityCooldowns = {
-    Feed: 0,
-    Water: 0
-};
 
 // ==========================================
 // GLOBÁLIS KIEGÉSZÍTŐK 
@@ -834,6 +818,13 @@ function resetFortuneCookie() {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#PetName')?.addEventListener('blur', () => {
+    const NewName = document.querySelector('#PetName').textContent.trim();
+    if (NewName && currentSaveKey) {
+        SavePetData();
+    }
+    });
+
     // 1. Minigame menü léptetés
     document.getElementById('nav-game-prev')?.addEventListener('click', () => {
         if (typeof changeGame === 'function') changeGame(-1);
