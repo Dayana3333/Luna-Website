@@ -771,6 +771,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof resetFortuneCookie === 'function') resetFortuneCookie();
     });
 
+    // ---- Cookie Catcher Start Gomb ----
+    document.getElementById('catcher-start-btn')?.addEventListener('click', () => {
+        if (typeof startCatcherGame === 'function') startCatcherGame();
+    });
+
     // 8. Lofi Rádió ki/be kapcsolás (Javított ID: lofi-radio)
     document.getElementById('lofi-radio')?.addEventListener('click', () => {
         if (typeof toggleRadio === 'function') toggleRadio();
