@@ -25,6 +25,12 @@ const SUPABASE_URL = "https://borusbjllkypavkoujqk.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvcnVzYmpsbGt5cGF2a291anFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5NzgzMzEsImV4cCI6MjA5NzU1NDMzMX0.LD1tM6qd9DdSK0SL4DGQyK0Zb-X-chgR1IokR_m2Ox4";
 let supabaseClient;
 
+// Backend that exchanges an OAuth2 "code" for an access_token. Needs the
+// Discord client secret, which can never live in this frontend file — that
+// exchange happens server-side on Kranem instead. Inside Discord this must
+// go through the proxy mapping above (raw external URLs get CSP-blocked).
+const KRANEM_DIRECT_URL = "http://intel0.kranem.hu:25692/api/token";
+
 const isDiscordActivity =
     window.location.search.includes("frame_id=") ||
     window.location.search.includes("instance_id=");
@@ -34,10 +40,12 @@ const isDiscordActivity =
 // what the CSP "connect-src" error was about. patchUrlMappings rewrites
 // fetch() calls under the hood so the Supabase client code below doesn't
 // need to change at all; it just needs to be told to use a relative path
-// instead of the real Supabase URL when running as an Activity.
+// instead of the real Supabase URL when running as an Activity. The same
+// applies to the Kranem backend used for the OAuth2 token exchange.
 if (isDiscordActivity) {
     patchUrlMappings([
         { prefix: "/supabase-api", target: "borusbjllkypavkoujqk.supabase.co" },
+        { prefix: "/kranem-api", target: "intel0.kranem.hu:25692" },
     ]);
 }
 
@@ -49,6 +57,10 @@ function initSupabase() {
 }
 
 supabaseClient = initSupabase();
+
+const TOKEN_EXCHANGE_URL = isDiscordActivity
+    ? `${window.location.origin}/kranem-api/api/token`
+    : KRANEM_DIRECT_URL;
 
 let discordSdk = null;
 
@@ -73,15 +85,40 @@ async function setupDiscordActivity() {
     }
     try {
         await discordSdk.ready();
-        await discordSdk.commands.authorize({
+
+        const { code } = await discordSdk.commands.authorize({
             client_id: "1088855742502678538",
             response_type: "code",
             state: "",
             prompt: "none",
-            scope: ["identify", "guilds.join"],
+            scope: ["identify", "guilds.join", "rpc.activities.write"],
         });
+
+        // Exchange the code for an access_token via our own backend (Kranem).
+        // This step needs the Discord client secret, which only the backend
+        // has — the frontend can never hold it.
+        const tokenResponse = await fetch(TOKEN_EXCHANGE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+        });
+
+        if (!tokenResponse.ok) {
+            throw new Error(`Token exchange failed: ${tokenResponse.status}`);
+        }
+
+        const { access_token } = await tokenResponse.json();
+
+        if (!access_token) {
+            throw new Error("No access_token returned from backend");
+        }
+
+        // Authenticate the SDK session — required before setActivity() will
+        // work. This is the step that was missing before (error 4006).
+        await discordSdk.commands.authenticate({ access_token });
+
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
-        
+
         await updateDiscordPresence();
         FetchPetData();
     } catch (error) {
