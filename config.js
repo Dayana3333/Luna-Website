@@ -13,7 +13,7 @@ const Body = document.body;
 const Raccoon = document.querySelector('#Raccoon');
 
 let PetData = null;
-let Raccooins = 100;
+let Raccooins = 0;
 let RelationshipPoints = 0;
 let currentSaveKey = null;
 let isSaving = false;
@@ -87,7 +87,7 @@ async function setupDiscordActivity() {
             .eq('guild_id', currentSaveKey)
             .single();
         if (error || !data) return;
-        Raccooins = data.raccooin || 100;
+        Raccooins = data.raccooin ?? 100;
         RelationshipPoints = data.relationship_points || 0;
         const petNameEl = document.querySelector('#PetName');
         if (petNameEl) petNameEl.innerText = data.name;
@@ -197,7 +197,7 @@ async function FetchPetData() {
         }
 
         PetData = data;
-        Raccooins = data.raccooin || 100;
+        Raccooins = data.raccooin ?? 100;
         RelationshipPoints = data.relationship_points || 0;
 
         const petNameEl = document.querySelector('#PetName');
