@@ -188,9 +188,45 @@ const ActivityCooldowns = {
     Water: 0
 };
 
+// index 4 = Cookie Catcher, no cooldown
 const MinigameCooldowns = [0, 0, 0, 0, 0, 0];
-const MinigameLocked = [false, false, false, false, false, false];
-let MinigameCooldownTimer = null;
+const MINIGAME_COOLDOWN_MS = 60000;
+const NO_COOLDOWN_GAMES = [4]; // Cookie Catcher index
+
+// ==========================================
+// UNIFIED COOLDOWN ENGINE
+// ==========================================
+
+const cooldownIntervals = {};
+
+function startCooldown(btnId, durationMs, labelText) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    const endTime = Date.now() + durationMs;
+    btn.classList.add('cooldown');
+    btn.disabled = true;
+
+    const originalHTML = btn.dataset.originalHtml || btn.innerHTML;
+    btn.dataset.originalHtml = originalHTML;
+
+    function tick() {
+        const remaining = Math.ceil((endTime - Date.now()) / 1000);
+        if (remaining <= 0) {
+            btn.classList.remove('cooldown');
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+            clearInterval(cooldownIntervals[btnId]);
+            delete cooldownIntervals[btnId];
+            return;
+        }
+        btn.innerHTML = `${labelText}<span class="cooldown-timer">${remaining}s</span>`;
+    }
+
+    tick();
+    if (cooldownIntervals[btnId]) clearInterval(cooldownIntervals[btnId]);
+    cooldownIntervals[btnId] = setInterval(tick, 250);
+}
 
 // ==========================================
 // MINIJÁTÉK RENDSZER VÁLTOZÓI
@@ -338,13 +374,12 @@ function Activity(ActionType) {
     }
 
     if (ActionType === "Feed" || ActionType === "Water") {
-        ActivityCooldowns[ActionType] = Date.now() + 30000;
-        const Btn = ActionType === "Feed"
-            ? document.querySelector("#FeedButton")
-            : document.querySelector("#WaterButton");
-        if (Btn) {
-            Btn.classList.add('cooldown');
-            setTimeout(() => { Btn.classList.remove('cooldown'); }, 30000);
+        const cdMs = 30000;
+        ActivityCooldowns[ActionType] = Date.now() + cdMs;
+        if (ActionType === "Feed") {
+            startCooldown("FeedButton", cdMs, "🍜 Feed");
+        } else {
+            startCooldown("WaterButton", cdMs, "💧 Water");
         }
     }
 
@@ -511,6 +546,7 @@ function resetTTT() {
     tttBoard = ["", "", "", "", "", "", "", "", ""]; tttActive = true;
     document.getElementById('ttt-status').innerText = "Your turn (❌)";
     document.querySelectorAll('.ttt-cell').forEach(c => { c.innerText = ""; c.style.color = "#fff"; });
+    startCooldown("ttt-reset-btn", MINIGAME_COOLDOWN_MS, "Reset Game");
 }
 
 // ---- 2. MEMORY MATCH ----
@@ -562,6 +598,7 @@ function flipCard(card) {
 
 function restartMemoryGame() {
     initMemoryGame();
+    startCooldown("memory-restart-btn", MINIGAME_COOLDOWN_MS, "Restart");
 }
 
 // ---- 3. SUSHI TAP ----
@@ -576,6 +613,7 @@ function startSushiGame() {
     sushiScore = 0; sushiTimeLeft = 15;
     document.getElementById('sushi-status').innerText = `Score: 0 | Time: 15s`;
     moveSushi();
+    startCooldown("sushi-start-btn", MINIGAME_COOLDOWN_MS, "Start Game");
     sushiTimer = setInterval(() => {
         sushiTimeLeft--;
         document.getElementById('sushi-status').innerText = `Score: ${sushiScore} | Time: ${sushiTimeLeft}s`;
@@ -621,6 +659,7 @@ function checkScrambleGuess() {
     if (guess === currentWord) {
         document.getElementById('scramble-status').innerText = "🎉 Correct! +60RC";
         Raccooins += 60; UpdateUI(); SavePetData();
+        startCooldown("scramble-submit-btn", MINIGAME_COOLDOWN_MS, "Submit");
         setTimeout(nextScramble, 1200);
     } else {
         document.getElementById('scramble-status').innerText = "❌ Wrong! Try again!";
@@ -796,6 +835,7 @@ function resetFortuneCookie() {
     document.getElementById('cookie-status').innerText = "Click the Cookie to break it";
     document.getElementById('cookie-fortune-text').innerText = "";
     document.getElementById('cookie-reset-btn').style.display = 'none';
+    startCooldown("cookie-reset-btn", MINIGAME_COOLDOWN_MS, "New Cookie");
 }
 
 // ==========================================
