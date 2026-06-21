@@ -29,7 +29,7 @@ let supabaseClient;
 // Discord client secret, which can never live in this frontend file — that
 // exchange happens server-side on Kranem instead. Inside Discord this must
 // go through the proxy mapping above (raw external URLs get CSP-blocked).
-const KRANEM_DIRECT_URL = "http://intel0.kranem.hu:25692/api/token";
+const KRANEM_DIRECT_URL = "https://luna-token-exchange.yourname.workers.dev";
 
 const isDiscordActivity =
     window.location.search.includes("frame_id=") ||
@@ -58,9 +58,7 @@ function initSupabase() {
 
 supabaseClient = initSupabase();
 
-const TOKEN_EXCHANGE_URL = isDiscordActivity
-    ? `${window.location.origin}/kranem-api/api/token`
-    : KRANEM_DIRECT_URL;
+const TOKEN_EXCHANGE_URL = "https://luna-token-exchange.yourname.workers.dev";
 
 let discordSdk = null;
 
