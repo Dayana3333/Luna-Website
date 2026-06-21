@@ -635,6 +635,30 @@ if (catcherZone && catcherBasket) {
     });
 }
 
+// ---- 5. COOKIE CATCHER JÁTÉK LOGIKA ----
+
+function startCatcherGame() {
+    if (isCatcherActive) return;
+    WakeUp();
+    isCatcherActive = true;
+    catcherScore = 0;
+    catcherTimer = 20;
+    if (catcherStartBtn) catcherStartBtn.style.display = 'none';
+    if (catcherStatus) catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
+    
+    // Ez a sor kereste a spawnCatcherItem-et:
+    catcherInterval = setInterval(spawnCatcherItem, 500);
+    
+    catcherCountdown = setInterval(() => {
+        catcherTimer--;
+        if (catcherStatus) {
+            catcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
+        }
+        if (catcherTimer <= 0) endCatcherGame();
+    }, 1000);
+}
+
+// EZ HIÁNYZOTT A KÓDODBÓL:
 function spawnCatcherItem() {
     if (!isCatcherActive || !catcherZone) return;
 
@@ -642,7 +666,6 @@ function spawnCatcherItem() {
     item.classList.add('falling-cookie');
     item.innerText = '🍪'; 
     
-    // Véletlenszerű vízszintes pozíció a zónán belül
     const rect = catcherZone.getBoundingClientRect();
     const randomX = Math.floor(Math.random() * (rect.width - 25));
     
@@ -651,7 +674,6 @@ function spawnCatcherItem() {
     catcherZone.appendChild(item);
 
     let itemTop = 0;
-    // Süti zuhanásának időzítése
     const fallInterval = setInterval(() => {
         if (!isCatcherActive) {
             clearInterval(fallInterval);
@@ -662,23 +684,21 @@ function spawnCatcherItem() {
         itemTop += 5; 
         item.style.top = itemTop + 'px';
 
-        // Kosár pozíciójának lekérése az ütközéshez
         const basketLeft = parseFloat(catcherBasket.style.left) || 0;
         const zoneHeight = rect.height;
 
-        // Ütközés vizsgálata (ha eléri a kosár magasságát)
+        // Ütközés figyelése a kosárral
         if (itemTop >= zoneHeight - 40 && itemTop <= zoneHeight - 10) {
-            const itemLeft = randomX;
-            // Ha a süti a kosár szélességén belül van (kosár kb 30px széles)
-            if (itemLeft >= basketLeft - 15 && itemLeft <= basketLeft + 30) {
+            if (randomX >= basketLeft - 15 && randomX <= basketLeft + 30) {
                 catcherScore++;
-                catcherStatus.innerText = `Score: ${catcherScore} | Time: ${catcherTimer}s`;
+                if (catcherStatus) {
+                    catcherStatus.innerText = `Score: ${catcherScore} | Time: ${catcherTimer}s`;
+                }
                 clearInterval(fallInterval);
                 item.remove();
             }
         }
 
-        // Ha leesett a földre és nem kaptuk el
         if (itemTop > zoneHeight) {
             clearInterval(fallInterval);
             item.remove();
@@ -691,25 +711,24 @@ function endCatcherGame() {
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
     
-    // Sütik takarítása
     document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
     
-    // Jutalmak kiszámítása
-    const prizeRC = Math.floor(catcherScore * 5); // 5 Raccooin per süti
-    const prizeRP = Math.floor(catcherScore * 2); // 2 Relationship pont per süti
+    const prizeRC = Math.floor(catcherScore * 5); 
+    const prizeRP = Math.floor(catcherScore * 2); 
     
-    Raccooins += prizeRC;
-    RelationshipPoints += prizeRP;
+    if (typeof Raccooins !== 'undefined') Raccooins += prizeRC;
+    if (typeof RelationshipPoints !== 'undefined') RelationshipPoints += prizeRP;
     
-    catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
+    if (catcherStatus) {
+        catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
+    }
     
-    // Start gomb újra megjelenítése
     if (catcherStartBtn) {
         catcherStartBtn.style.display = 'inline-block';
     }
     
-    UpdateUI();
-    SavePetData();
+    if (typeof UpdateUI === 'function') UpdateUI();
+    if (typeof SavePetData === 'function') SavePetData();
 }
 
 // ---- 6. FORTUNE COOKIE ----
