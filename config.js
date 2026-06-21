@@ -635,20 +635,81 @@ if (catcherZone && catcherBasket) {
     });
 }
 
-function startCatcherGame() {
-    if (isCatcherActive) return;
-    WakeUp();
-    isCatcherActive = true;
-    catcherScore = 0;
-    catcherTimer = 20;
-    catcherStartBtn.style.display = 'none';
-    catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
-    catcherInterval = setInterval(spawnCatcherItem, 500);
-    catcherCountdown = setInterval(() => {
-        catcherTimer--;
-        catcherStatus.innerText = "Score: " + catcherScore + " | Time: " + catcherTimer + "s";
-        if (catcherTimer <= 0) endCatcherGame();
-    }, 1000);
+function spawnCatcherItem() {
+    if (!isCatcherActive || !catcherZone) return;
+
+    const item = document.createElement('div');
+    item.classList.add('falling-cookie');
+    item.innerText = '🍪'; 
+    
+    // Véletlenszerű vízszintes pozíció a zónán belül
+    const rect = catcherZone.getBoundingClientRect();
+    const randomX = Math.floor(Math.random() * (rect.width - 25));
+    
+    item.style.left = randomX + 'px';
+    item.style.top = '0px';
+    catcherZone.appendChild(item);
+
+    let itemTop = 0;
+    // Süti zuhanásának időzítése
+    const fallInterval = setInterval(() => {
+        if (!isCatcherActive) {
+            clearInterval(fallInterval);
+            item.remove();
+            return;
+        }
+
+        itemTop += 5; 
+        item.style.top = itemTop + 'px';
+
+        // Kosár pozíciójának lekérése az ütközéshez
+        const basketLeft = parseFloat(catcherBasket.style.left) || 0;
+        const zoneHeight = rect.height;
+
+        // Ütközés vizsgálata (ha eléri a kosár magasságát)
+        if (itemTop >= zoneHeight - 40 && itemTop <= zoneHeight - 10) {
+            const itemLeft = randomX;
+            // Ha a süti a kosár szélességén belül van (kosár kb 30px széles)
+            if (itemLeft >= basketLeft - 15 && itemLeft <= basketLeft + 30) {
+                catcherScore++;
+                catcherStatus.innerText = `Score: ${catcherScore} | Time: ${catcherTimer}s`;
+                clearInterval(fallInterval);
+                item.remove();
+            }
+        }
+
+        // Ha leesett a földre és nem kaptuk el
+        if (itemTop > zoneHeight) {
+            clearInterval(fallInterval);
+            item.remove();
+        }
+    }, 30);
+}
+
+function endCatcherGame() {
+    isCatcherActive = false;
+    clearInterval(catcherInterval);
+    clearInterval(catcherCountdown);
+    
+    // Sütik takarítása
+    document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
+    
+    // Jutalmak kiszámítása
+    const prizeRC = Math.floor(catcherScore * 5); // 5 Raccooin per süti
+    const prizeRP = Math.floor(catcherScore * 2); // 2 Relationship pont per süti
+    
+    Raccooins += prizeRC;
+    RelationshipPoints += prizeRP;
+    
+    catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
+    
+    // Start gomb újra megjelenítése
+    if (catcherStartBtn) {
+        catcherStartBtn.style.display = 'inline-block';
+    }
+    
+    UpdateUI();
+    SavePetData();
 }
 
 // ---- 6. FORTUNE COOKIE ----
