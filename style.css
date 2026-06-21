@@ -675,3 +675,57 @@ body {
     50% { transform: scale(1.3) rotate(10deg); filter: brightness(1.5); }
     100% { transform: scale(1) rotate(0); content: "🥠"; }
 }
+
+/* --- MOBIL ÉS KISMÉRETŰ KIJELZŐK STÍLUSAI (max-width: 768px) --- */
+@media screen and (max-width: 768px) {
+    
+    /* Flexbox elrendezések egymás alá törése */
+    body, .main-container, .game-container, .shop-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 10px !important;
+    }
+
+    /* Fix szélességű panelek folyékonnyá tétele */
+    #minigame-box, .panel, .ShopPanel, .StatusPanel {
+        width: 100% !important;
+        max-width: 400px !important; /* Maximális szélesség mobilon, hogy ne nyúljon túl szélesre */
+        margin: 10px 0 !important;
+        box-sizing: border-box;
+    }
+
+    /* Bolt (Shop) kártyák elrendezése mobilon */
+    .ShopGrid, .GridContainer {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        width: 100% !important;
+    }
+
+    .ItemCard {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Betűméretek és feliratok igazítása kisebb kijelzőkhöz */
+    h1, .game-title {
+        font-size: 1.5rem !important;
+        text-align: center;
+    }
+
+    h2, h3 {
+        font-size: 1.2rem !important;
+    }
+
+    /* Interaktív zónák (pl. játékterek, gombok) átméretezése, ha szükséges */
+    .catcher-area, .cookie-click-zone {
+        margin: 0 auto !important; /* Középre igazítás */
+    }
+
+    /* Gombok érintőképernyő-barát méretezése (könnyebb legyen rányomni) */
+    button, .BuyButton, .nav-btn {
+        padding: 12px 20px !important;
+        font-size: 1rem !important;
+        min-height: 44px; /* Ajánlott minimális érintési felület */
+    }
+}
