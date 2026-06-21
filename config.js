@@ -1,5 +1,3 @@
-import { createClient } from "./supabase.js";
-import { DiscordSDK } from "./discord-sdk.js";
 
 // ==========================================
 // GLOBÁLIS VÁLTOZÓK ÉS ELEMEK
