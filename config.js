@@ -77,15 +77,32 @@ try {
 // ==========================================
 
 async function setupDiscordActivity() {
+    const startPolling = () => {
+        setInterval(async () => {
+            if (!currentSaveKey) return;
+            const { data, error } = await supabaseClient
+                .from('luna_data')
+                .select('*')
+                .eq('guild_id', currentSaveKey)
+                .single();
+            if (error || !data) return;
+            Raccooins = data.raccooin || 100;
+            RelationshipPoints = data.relationship_points || 0;
+            const petNameEl = document.querySelector('#PetName');
+            if (petNameEl) petNameEl.innerText = data.name;
+            UpdateUI();
+        }, 5000);
+    };
+
     if (!discordSdk) {
         console.log("Local mode — no Discord SDK.");
         currentSaveKey = "default_local_testing";
         FetchPetData();
+        startPolling();
         return;
     }
     try {
         await discordSdk.ready();
-
         const { code } = await discordSdk.commands.authorize({
             client_id: "1088855742502678538",
             response_type: "code",
@@ -93,38 +110,28 @@ async function setupDiscordActivity() {
             prompt: "none",
             scope: ["identify", "guilds.join", "rpc.activities.write"],
         });
-
-        // Exchange the code for an access_token via our own backend (Kranem).
-        // This step needs the Discord client secret, which only the backend
-        // has — the frontend can never hold it.
         const tokenResponse = await fetch(TOKEN_EXCHANGE_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ code }),
         });
-
         if (!tokenResponse.ok) {
             throw new Error(`Token exchange failed: ${tokenResponse.status}`);
         }
-
         const { access_token } = await tokenResponse.json();
-
         if (!access_token) {
             throw new Error("No access_token returned from backend");
         }
-
-        // Authenticate the SDK session — required before setActivity() will
-        // work. This is the step that was missing before (error 4006).
         await discordSdk.commands.authenticate({ access_token });
-
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
-
         await updateDiscordPresence();
         FetchPetData();
+        startPolling();
     } catch (error) {
         console.error("Discord Activity error:", error);
         currentSaveKey = "default_local_testing";
         FetchPetData();
+        startPolling();
     }
 }
 
