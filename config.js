@@ -21,12 +21,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 function initSupabase() {
-    try {
-        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (err) {
-        console.error("Failed to initialize Supabase:", err);
-        return null;
-    }
+    // Közvetlenül inicializáljuk az importált createClient-tel, elkerülve a 'supabase is not defined' hibát
+    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 supabaseClient = initSupabase();
@@ -721,4 +717,87 @@ ResetSleepTimer();
 window.addEventListener("load", () => {
     setupDiscordActivity();
     FetchPetData();
+});
+
+// =========================================================================
+// DISCORD CSP BIZTONSÁGI ESEMÉNYKEZELŐK REGISZTRÁCIÓJA (Másold a config.js legvégére)
+// =========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Minigame menü léptetés
+    document.getElementById('nav-game-prev')?.addEventListener('click', () => {
+        if (typeof changeGame === 'function') changeGame(-1);
+    });
+    document.getElementById('nav-game-next')?.addEventListener('click', () => {
+        if (typeof changeGame === 'function') changeGame(1);
+    });
+
+    // 2. Tic-Tac-Toe mezők kattintása
+    document.querySelectorAll('.ttt-cell').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const index = parseInt(cell.getAttribute('data-index'), 10);
+            if (!isNaN(index) && typeof playerMove === 'function') {
+                playerMove(index);
+            }
+        });
+    });
+    document.getElementById('ttt-reset-btn')?.addEventListener('click', () => {
+        if (typeof resetTTT === 'function') resetTTT();
+    });
+
+    // 3. Memory Match újraindítás
+    document.getElementById('memory-restart-btn')?.addEventListener('click', () => {
+        if (typeof restartMemoryGame === 'function') restartMemoryGame();
+    });
+
+    // 4. Sushi Tap játék
+    document.getElementById('sushi-target')?.addEventListener('click', () => {
+        if (typeof tapSushi === 'function') tapSushi();
+    });
+    document.getElementById('sushi-start-btn')?.addEventListener('click', () => {
+        if (typeof startSushiGame === 'function') startSushiGame();
+    });
+
+    // 5. Word Scramble beküldés
+    document.getElementById('scramble-submit-btn')?.addEventListener('click', () => {
+        if (typeof checkScrambleGuess === 'function') checkScrambleGuess();
+    });
+
+    // 6. Cookie Catcher indítás
+    document.getElementById('catcher-start-btn')?.addEventListener('click', () => {
+        if (typeof startCatcherGame === 'function') startCatcherGame();
+    });
+
+    // 7. Fortune Cookie törés és reset
+    document.getElementById('fortune-cookie-target')?.addEventListener('click', () => {
+        if (typeof clickFortuneCookie === 'function') clickFortuneCookie();
+    });
+    document.getElementById('cookie-reset-btn')?.addEventListener('click', () => {
+        if (typeof resetFortuneCookie === 'function') resetFortuneCookie();
+    });
+
+    // 8. Lofi Rádió ki/be kapcsolás
+    document.getElementById('lofi-radio')?.addEventListener('click', () => {
+        if (typeof toggleRadio === 'function') toggleRadio();
+    });
+
+    // 9. Kisállat interakciók (Feed, Water, Pet)
+    document.querySelectorAll('button[data-activity]').forEach(button => {
+        button.addEventListener('click', () => {
+            const activityType = button.getAttribute('data-activity');
+            if (activityType && typeof Activity === 'function') {
+                Activity(activityType);
+            }
+        });
+    });
+
+    // 10. Bolt vásárlás gombok
+    document.querySelectorAll('.BuyButton[data-item]').forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.getAttribute('data-item');
+            const price = parseInt(button.getAttribute('data-price'), 10);
+            if (item && !isNaN(price) && typeof BuyItem === 'function') {
+                BuyItem(item, price);
+            }
+        });
+    });
 });

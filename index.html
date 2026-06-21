@@ -9,18 +9,14 @@
 
     <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-</head>
+    </head>
 
 <body>
     <div id="minigame-box" class="minigame-container locked">
         <div class="minigame-header">
-            <button class="nav-btn" onclick="changeGame(-1)">&lt;</button>
+            <button class="nav-btn" id="nav-game-prev">&lt;</button>
             <h2 id="menu-title">1 / 6</h2>
-            <button class="nav-btn" onclick="changeGame(1)">&gt;</button>
+            <button class="nav-btn" id="nav-game-next">&gt;</button>
         </div>
         
         <div id="minigame-overlay" class="game-overlay">
@@ -34,107 +30,101 @@
                 <h3 class="game-title">Tic-Tac-Toe</h3>
                 <p class="game-status" id="ttt-status">Your turn (❌)</p>
                 <div class="ttt-board">
-                    <div class="ttt-cell" onclick="playerMove(0)"></div>
-                    <div class="ttt-cell" onclick="playerMove(1)"></div>
-                    <div class="ttt-cell" onclick="playerMove(2)"></div>
-                    <div class="ttt-cell" onclick="playerMove(3)"></div>
-                    <div class="ttt-cell" onclick="playerMove(4)"></div>
-                    <div class="ttt-cell" onclick="playerMove(5)"></div>
-                    <div class="ttt-cell" onclick="playerMove(6)"></div>
-                    <div class="ttt-cell" onclick="playerMove(7)"></div>
-                    <div class="ttt-cell" onclick="playerMove(8)"></div>
+                    <div class="ttt-cell" data-index="0"></div>
+                    <div class="ttt-cell" data-index="1"></div>
+                    <div class="ttt-cell" data-index="2"></div>
+                    <div class="ttt-cell" data-index="3"></div>
+                    <div class="ttt-cell" data-index="4"></div>
+                    <div class="ttt-cell" data-index="5"></div>
+                    <div class="ttt-cell" data-index="6"></div>
+                    <div class="ttt-cell" data-index="7"></div>
+                    <div class="ttt-cell" data-index="8"></div>
                 </div>
-                <button class="game-btn" onclick="resetTTT()">Reset Game</button>
+                <button class="game-btn" id="ttt-reset-btn">Reset Game</button>
             </div>
 
-            <div class="game-view" id="game-view-1" style="display:none;">
+            <div class="game-view" id="game-view-1" style="display: none;">
                 <h3 class="game-title">Luna Memory Match</h3>
-                <p class="game-status" id="memory-status">Find the pairs!</p>
-                <div class="memory-board" id="memory-grid"></div>
-                <button class="game-btn" onclick="restartMemoryGame()">Restart</button>
+                <p class="game-status" id="memory-status">Find the pairs! Clicks: 0</p>
+                <div class="memory-grid" id="memory-grid"></div>
+                <button class="game-btn" id="memory-restart-btn">Restart</button>
             </div>
 
-            <div class="game-view" id="game-view-2" style="display:none;">
+            <div class="game-view" id="game-view-2" style="display: none;">
                 <h3 class="game-title">Sushi Tap</h3>
-                <p class="game-status" id="sushi-status">Tap the food! Time: 15s</p>
-                <div class="sushi-area" id="sushi-tap-zone">
-                    <div id="sushi-target" onclick="tapSushi()">🍣</div>
+                <p class="game-status" id="sushi-status">Score: 0 | Time: 15s</p>
+                <div class="sushi-game-area">
+                    <div id="sushi-target">🍣</div>
                 </div>
-                <button class="game-btn" onclick="startSushiGame()">Start Game</button>
+                <button class="game-btn" id="sushi-start-btn">Start Game</button>
             </div>
 
-            <div class="game-view" id="game-view-3" style="display:none;">
+            <div class="game-view" id="game-view-3" style="display: none;">
                 <h3 class="game-title">Word Scramble</h3>
-                <p class="game-status" id="scramble-status">Unscramble the word!</p>
-                <div class="scramble-container">
-                    <div id="scrambled-word">????</div>
-                    <input type="text" id="scramble-input" placeholder="Your guess...">
-                    <button class="game-btn" onclick="checkScrambleGuess()">Submit</button>
+                <p class="game-status" id="scramble-status">Guess the word!</p>
+                <div class="scramble-box">
+                    <div id="scrambled-word" class="scrambled-text">LUNA</div>
+                    <input type="text" id="scramble-input" placeholder="Your guess..." autocomplete="off">
+                    <button class="game-btn" id="scramble-submit-btn">Submit</button>
                 </div>
             </div>
 
-            <div class="game-view" id="game-view-4" style="display:none;">
+            <div class="game-view" id="game-view-4" style="display: none;">
                 <h3 class="game-title">Cookie Catcher</h3>
-                <p class="game-status" id="catcher-status">Move your cursor! Time: 20s</p>
+                <p class="game-status" id="catcher-status">Score: 0 | Time: 15s</p>
                 <div class="catcher-area" id="catcher-zone">
-                    <div id="catcher-basket">🥣</div>
+                    <div id="catcher-basket">🧺</div>
                 </div>
-                <button class="game-btn" id="catcher-start-btn" onclick="startCatcherGame()">Start Game</button>
+                <button class="game-btn" id="catcher-start-btn">Start Game</button>
             </div>
 
-            <div class="game-view" id="game-view-5" style="display:none;">
+            <div class="game-view" id="game-view-5" style="display: none;">
                 <h3 class="game-title">Fortune Cookie</h3>
-                <p class="game-status" id="cookie-status">Click the Fortune Cookie to break it!</p>
+                <p class="game-status" id="cookie-status">Click the Cookie to break it</p>
                 <div class="cookie-click-zone">
-                    <div id="fortune-cookie-target" onclick="clickFortuneCookie()">🥠</div>
+                    <div id="fortune-cookie-target">🥠</div>
+                    <div id="cookie-fortune-text" class="fortune-text"></div>
                 </div>
-                <div id="cookie-fortune-text" style="min-height: 40px; margin-top: 10px; font-size: 14px; color: #f3da90; text-align: center; padding: 0 10px;"></div>
-                <button class="game-btn" id="cookie-reset-btn" onclick="resetFortuneCookie()" style="display: none;">New Cookie</button>
+                <button class="game-btn" id="cookie-reset-btn" style="display: none;">New Cookie</button>
             </div>
 
         </div>
     </div>
 
-    <div class="radio-container">
-        <img id="lofi-radio" src="imgs/radio.png" alt="Lofi Radio" onclick="toggleRadio()">
-        <span id="radio-status">OFF</span>
-    </div>
-
-    <iframe id="youtube-player" src="https://www.youtube.com/embed/X4VbdwhkE10?enablejsapi=1&autoplay=0&mute=0"
-        style="display: none;" allow="autoplay; encrypted-media">
-    </iframe>
-
-    <div class="PetArea">
-        <h1 contenteditable="true" spellcheck="false" id="PetName">Luna</h1>
-
-        <div class="pet pet-idle">
-            <img src="imgs/raccoon.png" id="Raccoon">
+    <div class="MusicContainer">
+        <img id="lofi-radio" src="imgs/radio.png" alt="Lofi Radio">
+        <div id="RadioStatus">Radio: OFF</div>
         </div>
 
-        <div class="Buttons">
-            <button class="Button" id="FeedButton" onclick="Activity('Feed')">🍜 Feed</button>
-            <button class="Button" id="WaterButton" onclick="Activity('Water')">💧 Water</button>
-            <button class="Button" onclick="Activity('Pet')">❤️ Pet</button>
+    <div class="MainContainer">
+        <div class="CurrencyDisplay">
+            <img src="imgs/raccooin.png" alt="RC" class="CurrencyIcon">
+            <span id="CurrencyValue">100 RC</span>
         </div>
-    </div>
 
-    <div class="Shop">
-        <div class="CoinContainer">
-            <div class="CoinIconContainer">
-                <img src="imgs/raccooin.png" title="Raccooin" alt="Raccooin" id="CoinIcon">
+        <div class="PetArea">
+            <div id="PetName">Luna</div>
+            <div class="RaccoonContainer">
+                <img src="imgs/luna_idle.gif" alt="Luna" id="Raccoon">
+                <div id="speech-bubble" class="speech-bubble" style="display: none;"></div>
             </div>
-            <div class="CoinTextContainer">10,000RC</div>
         </div>
 
-        <div class="ItemsContainer">
+        <div class="ActionContainer">
+            <button class="Button" id="FeedButton" data-activity="Feed">🍜 Feed</button>
+            <button class="Button" id="WaterButton" data-activity="Water">💧 Water</button>
+            <button class="Button" data-activity="Pet">❤️ Pet</button>
+        </div>
+
+        <div class="ShopContainer">
             <div class="ItemCard">
                 <div class="ItemPreview">
-                    <img src="imgs/bubble-tea.png" title="Bubble Tea" alt="Bubble Tea" class="ItemImage">
+                    <img src="imgs/btea.png" title="Bubble Tea" alt="Bubble Tea" class="ItemImage">
                 </div>
                 <div class="ItemDetails">
                     <h3 class="ItemName">Bubble Tea</h3>
                     <p class="ItemPrice">Price: 50RC</p>
-                    <button class="BuyButton" onclick="BuyItem('bubble_tea', 50)">Buy</button>
+                    <button class="BuyButton" data-item="bubble_tea" data-price="50">Buy</button>
                 </div>
             </div>
 
@@ -145,7 +135,7 @@
                 <div class="ItemDetails">
                     <h3 class="ItemName">Steamed Buns</h3>
                     <p class="ItemPrice">Price: 80RC</p>
-                    <button class="BuyButton" onclick="BuyItem('pork_buns', 80)">Buy</button>
+                    <button class="BuyButton" data-item="pork_buns" data-price="80">Buy</button>
                 </div>
             </div>
 
@@ -156,7 +146,7 @@
                 <div class="ItemDetails">
                     <h3 class="ItemName">Ramen</h3>
                     <p class="ItemPrice">Price: 100RC</p>
-                    <button class="BuyButton" onclick="BuyItem('ramen', 100)">Buy</button>
+                    <button class="BuyButton" data-item="ramen" data-price="100">Buy</button>
                 </div>
             </div>
         </div>
