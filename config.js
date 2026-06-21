@@ -214,9 +214,11 @@ const totalGames = 6;
 const gameLimits = [5000, 100, 200, 300, 400, 500];
 const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scramble", "Cookie Catcher", "Fortune Cookie Cracker"];
 
+
 // ==========================================
 // HÁTTÉR (NAP/ÉJ CIKLUS)
 // ==========================================
+
 
 const DayBackgrounds = [
     "url('imgs/daylight_wp_1.jpg')",
@@ -227,6 +229,7 @@ const NightBackgrounds = [
     "url('imgs/night_wp_1.jpg')",
     "url('imgs/night_wp_2.jpg')"
 ];
+
 
 function SetBackground() {
     const Hour = new Date().getHours();
@@ -317,7 +320,6 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
 function Activity(ActionType) {
     const now = Date.now();
-
     if ((ActionType === "Feed" || ActionType === "Water") && ActivityCooldowns[ActionType] > now) return;
 
     if (!currentSaveKey) return;
@@ -352,7 +354,6 @@ function Activity(ActionType) {
             setTimeout(() => { Btn.classList.remove('cooldown'); }, 30000);
         }
     }
-
     SavePetData();
 }
 
@@ -448,10 +449,11 @@ function changeGame(direction) {
     document.getElementById(`game-view-${currentGameIndex}`).style.display = "none";
     currentGameIndex = (currentGameIndex + direction + totalGames) % totalGames;
     document.getElementById(`game-view-${currentGameIndex}`).style.display = "flex";
+
     if (currentGameIndex === 1) initMemoryGame();
     if (currentGameIndex === 3) nextScramble();
     checkMinigameUnlock(RelationshipPoints);
-}
+} 
 
 // ---- 1. TIC-TAC-TOE ----
 
