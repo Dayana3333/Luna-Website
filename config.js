@@ -611,30 +611,6 @@ function checkScrambleGuess() {
     }
 }
 
-// ---- 5. COOKIE CATCHER ----
-
-let catcherScore = 0;
-let isCatcherActive = false;
-let catcherTimer = 20;
-let catcherInterval = null;
-let catcherCountdown = null;
-
-const catcherZone = document.getElementById('catcher-zone');
-const catcherBasket = document.getElementById('catcher-basket');
-const catcherStatus = document.getElementById('catcher-status');
-const catcherStartBtn = document.getElementById('catcher-start-btn');
-
-if (catcherZone && catcherBasket) {
-    catcherZone.addEventListener('mousemove', (e) => {
-        if (!isCatcherActive) return;
-        const rect = catcherZone.getBoundingClientRect();
-        let x = e.clientX - rect.left - 15;
-        if (x < 0) x = 0;
-        if (x > rect.width - 30) x = rect.width - 30;
-        catcherBasket.style.left = x + 'px';
-    });
-}
-
 // ---- 5. COOKIE CATCHER JÁTÉK LOGIKA ----
 
 let catcherScore = 0;
