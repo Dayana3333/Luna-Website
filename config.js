@@ -281,10 +281,9 @@ const ActivityCooldowns = {
     Water: 0
 };
 
-// index 4 = Cookie Catcher, no cooldown
 const MinigameCooldowns = [0, 0, 0, 0, 0, 0];
 const MINIGAME_COOLDOWN_MS = 60000;
-const NO_COOLDOWN_GAMES = [4]; // Cookie Catcher index
+const NO_COOLDOWN_GAMES = [];
 
 // ==========================================
 // UNIFIED COOLDOWN ENGINE
