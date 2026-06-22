@@ -1020,46 +1020,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-// MOBIL PANEL RESPONSIVE VEZÉRLÉS (DISCORD WEBVIEW COMPATIBLE)
-// ==========================================
-function initMobilePanels() {
-    const minigameBox = document.getElementById('minigame-box');
-    const shopBox = document.getElementById('shop-box');
-    const btnToggleMinigame = document.getElementById('btn-toggle-minigame');
-    const btnToggleShop = document.getElementById('btn-toggle-shop');
-    const btnCloseMinigame = document.getElementById('btn-close-minigame');
-    const btnCloseShop = document.getElementById('btn-close-shop');
+    // MOBIL PANEL RESPONSIVE VEZÉRLÉS (DISCORD WEBVIEW COMPATIBLE)
+    // ==========================================
+    function initMobilePanels() {
+        const minigameBox = document.getElementById('minigame-box');
+        const shopBox = document.getElementById('shop-box');
+        const btnToggleMinigame = document.getElementById('btn-toggle-minigame');
+        const btnToggleShop = document.getElementById('btn-toggle-shop');
+        const btnCloseMinigame = document.getElementById('btn-close-minigame');
+        const btnCloseShop = document.getElementById('btn-close-shop');
 
-    if (btnToggleMinigame && minigameBox && shopBox) {
-        btnToggleMinigame.addEventListener('click', (e) => {
-            e.preventDefault();
-            minigameBox.classList.toggle('mobile-open');
-            shopBox.classList.remove('mobile-open');
-        });
-    }
+        if (btnToggleMinigame && minigameBox && shopBox) {
+            btnToggleMinigame.addEventListener('click', (e) => {
+                e.preventDefault();
+                minigameBox.classList.toggle('mobile-open');
+                shopBox.classList.remove('mobile-open');
+            });
+        }
 
-    if (btnToggleShop && shopBox && minigameBox) {
-        btnToggleShop.addEventListener('click', (e) => {
-            e.preventDefault();
-            shopBox.classList.toggle('mobile-open');
-            minigameBox.classList.remove('mobile-open');
-        });
-    }
+        if (btnToggleShop && shopBox && minigameBox) {
+            btnToggleShop.addEventListener('click', (e) => {
+                e.preventDefault();
+                shopBox.classList.toggle('mobile-open');
+                minigameBox.classList.remove('mobile-open');
+            });
+        }
 
-    if (btnCloseMinigame && minigameBox) {
-        btnCloseMinigame.addEventListener('click', (e) => {
-            e.preventDefault();
-            minigameBox.classList.remove('mobile-open');
-        });
-    }
+        if (btnCloseMinigame && minigameBox) {
+            btnCloseMinigame.addEventListener('click', (e) => {
+                e.preventDefault();
+                minigameBox.classList.remove('mobile-open');
+            });
+        }
 
-    if (btnCloseShop && shopBox) {
-        btnCloseShop.addEventListener('click', (e) => {
-            e.preventDefault();
-            shopBox.classList.remove('mobile-open');
-        });
+        if (btnCloseShop && shopBox) {
+            btnCloseShop.addEventListener('click', (e) => {
+                e.preventDefault();
+                shopBox.classList.remove('mobile-open');
+            });
+        }
     }
-}
 
     // Rendszer automatikus indítása a megfelelő sorrendben
     try {
