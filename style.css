@@ -782,7 +782,7 @@ body {
     .mobile-nav-bar {
         display: flex !important;
         position: fixed;
-        top: 100;
+        top: 50;
         left: 0 !important;
         width: 100% !important;
         height: 60px !important;
@@ -909,10 +909,10 @@ body {
 /* ===== Discord Activity responsive fix ===== */
 /* Discord Mobile Safe Area */
 .discord-mobile.force-mobile .mobile-nav-bar {
-    top: 100px !important;
+    top: 50px !important;
 }
 
 
 .discord-mobile.force-mobile body {
-    padding-top: 100px !important;
+    padding-top: 50px !important;
 }
