@@ -281,9 +281,10 @@ const ActivityCooldowns = {
     Water: 0
 };
 
+// index 4 = Cookie Catcher, no cooldown
 const MinigameCooldowns = [0, 0, 0, 0, 0, 0];
 const MINIGAME_COOLDOWN_MS = 60000;
-const NO_COOLDOWN_GAMES = [];
+const NO_COOLDOWN_GAMES = [4]; // Cookie Catcher index
 
 // ==========================================
 // UNIFIED COOLDOWN ENGINE
@@ -862,6 +863,7 @@ function endCatcherGame() {
     }
     if (catcherStartBtn) {
         catcherStartBtn.style.display = 'inline-block';
+        startCooldown("catcher-start-btn", MINIGAME_COOLDOWN_MS, "Start Game");
     }
     
     UpdateUI();
