@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Your Pet's Home</title>
 
-    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=24">
-    <link rel="stylesheet" href="style.css?v=24">
+    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=25">
+    <link rel="stylesheet" href="style.css?v=25">
 </head>
 
 <body>
@@ -170,8 +170,29 @@
         </div>
     </div>
 
-    <script src="vendor/supabase.js?v=24"></script>
-    <script type="module" src="config.js?v=24"></script>
+    <script src="vendor/supabase.js?v=25"></script>
+    <script type="module" src="config.js?v=25"></script>
+
+<script>
+(function(){
+    function updateResponsiveMode(){
+        const touch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+        const mobileMode = touch || (window.innerWidth <= 900 && window.innerHeight <= 700);
+
+        document.documentElement.classList.toggle('force-mobile', mobileMode);
+
+        const ua = navigator.userAgent || '';
+        const isDiscord = ua.includes('Discord');
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+
+        document.documentElement.classList.toggle('discord-mobile', isDiscord && isMobile);
+    }
+
+    updateResponsiveMode();
+    window.addEventListener('resize', updateResponsiveMode);
+})();
+</script>
+
 </body>
 
 </html>

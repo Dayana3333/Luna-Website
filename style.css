@@ -686,7 +686,7 @@ body {
 }
 
 /* --- MOBIL ÉS KISMÉRETŰ KIJELZŐK STÍLUSAI (max-width: 768px) --- */
-@media screen and (max-width: 768px) and (pointer: coarse) {
+@media screen and (max-width: 768px) {
     
     /* Flexbox elrendezések egymás alá törése */
     body, .main-container, .game-container, .shop-container {
@@ -740,7 +740,7 @@ body {
 }
 
 /* --- MOBIL ÉS DISCORD ACTIVITY RESPONSIVE NÉZET (max-width: 900px) --- */
-@media screen and (max-width: 900px) and (pointer: coarse) {
+@media screen and (max-width: 900px) {
     
     /* A Discord belső ablakának kényszerítése a normális görgetésre */
     html, body {
@@ -904,4 +904,28 @@ body {
         width: 45px !important;
         height: auto !important;
     }
+}
+
+/* ===== Discord Activity responsive fix ===== */
+.mobile-nav-bar,
+.panel-close-btn{
+    display:none;
+}
+
+.force-mobile .mobile-nav-bar,
+.force-mobile .panel-close-btn{
+    display:flex !important;
+}
+
+.force-mobile html,
+.force-mobile body{
+    padding-top:75px !important;
+}
+
+.discord-mobile.force-mobile body{
+    padding-top:120px !important;
+}
+
+.discord-mobile.force-mobile .mobile-nav-bar{
+    top:60px !important;
 }
