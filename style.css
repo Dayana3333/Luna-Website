@@ -792,6 +792,7 @@ body {
         padding: 8px !important;
         gap: 10px !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+        margin-bottom: 20px !important;
     }
 
     .mobile-toggle-btn {
@@ -910,8 +911,5 @@ body {
 /* Discord Mobile Safe Area */
 .discord-mobile.force-mobile .mobile-nav-bar {
     top: 50px !important;
-}
-
-.discord-mobile.force-mobile body {
-    padding-top: 50px !important;
+    margin-bottom: 20px !important;
 }
