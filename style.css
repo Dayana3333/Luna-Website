@@ -676,6 +676,15 @@ body {
     100% { transform: scale(1) rotate(0); content: "🥠"; }
 }
 
+/* --- DESKTOP: MOBIL ELEMEK ELREJTÉSE --- */
+.mobile-nav-bar {
+    display: none;
+}
+
+.panel-close-btn {
+    display: none;
+}
+
 /* --- MOBIL ÉS KISMÉRETŰ KIJELZŐK STÍLUSAI (max-width: 768px) --- */
 @media screen and (max-width: 768px) {
     
