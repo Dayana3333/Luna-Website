@@ -907,36 +907,13 @@ body {
 }
 
 /* ===== Discord Activity responsive fix ===== */
-.mobile-nav-bar,
-.panel-close-btn{
-    display:none;
+/* Discord Mobile Safe Area */
+.discord-mobile.force-mobile .mobile-nav-bar {
+    top: 100px !important;
 }
 
-.force-mobile .mobile-nav-bar,
-.force-mobile .panel-close-btn{
-    display:flex !important;
+/*
+.discord-mobile.force-mobile body {
+    padding-top: 110px !important;
 }
-
-.force-mobile html,
-.force-mobile body{
-    padding-top:75px !important;
-}
-
-.discord-mobile.force-mobile body{
-    padding-top:120px !important;
-}
-
-.discord-mobile.force-mobile .mobile-nav-bar{
-    top:60px !important;
-}
-
-
-/* Discord mobile header overlap fix */
-.discord-mobile.force-mobile body{
-    padding-top: 170px !important;
-}
-
-.discord-mobile.force-mobile .mobile-nav-bar{
-    top: 110px !important;
-    z-index: 1000 !important;
-}
+*/
