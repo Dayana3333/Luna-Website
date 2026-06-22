@@ -893,3 +893,10 @@ body {
     body, button, .mobile-toggle-btn, .panel-close-btn, .Button, .BuyButton {
     touch-action: manipulation !important;
 }
+
+body {
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
