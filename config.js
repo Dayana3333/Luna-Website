@@ -273,6 +273,9 @@ let SleepTimer = null;
 const SleepDelay = 5 * 60 * 1000;
 let isPlaying = false;
 
+const radioAudio = new Audio('audio/lofi-music.mp3');
+radioAudio.loop = true;
+
 const ActivityCooldowns = {
     Feed: 0,
     Water: 0
@@ -481,29 +484,25 @@ function Activity(ActionType) {
 // ==========================================
 
 function toggleRadio() {
-    const player = document.getElementById('youtube-player');
-    const radioImg = document.getElementById('lofi-radio');
-    const statusText = document.getElementById('radio-status');
+    const radioStatus = document.getElementById('radio-status');
+    
+    if (!radioStatus) return;
 
-    if (!player || !player.contentWindow) return;
-
-    if (!isPlaying) {
-        player.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[15]}', '*');
-        player.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        if (radioImg) radioImg.classList.add('radio-playing');
-        if (statusText) {
-            statusText.innerText = "🎵 Lofi ON";
-            statusText.style.color = "#00FF00";
-        }
-        isPlaying = true;
+    if (radioAudio.paused) {
+        // Ha nem szól a zene, megpróbáljuk elindítani
+        radioAudio.play()
+            .then(() => {
+                radioStatus.textContent = "ON";
+                radioStatus.style.color = "#55ff55"; 
+            })
+            .catch(error => {
+                console.error("Discord Audio lejátszási hiba:", error);
+            });
     } else {
-        player.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        if (radioImg) radioImg.classList.remove('radio-playing');
-        if (statusText) {
-            statusText.innerText = "OFF";
-            statusText.style.color = "#4a3e3d";
-        }
-        isPlaying = false;
+        // Ha már szól, akkor gombnyomásra megállítjuk
+        radioAudio.pause();
+        radioStatus.textContent = "OFF";
+        radioStatus.style.color = "#ff5555"; 
     }
 }
 
