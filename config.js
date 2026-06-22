@@ -1020,8 +1020,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // MOBIL PANEL RESPONSIVE VEZÉRLÉS (MODUL-KOMPATIBILIS)
-    // ==========================================
+// MOBIL PANEL RESPONSIVE VEZÉRLÉS (DISCORD WEBVIEW COMPATIBLE)
+// ==========================================
+function initMobilePanels() {
     const minigameBox = document.getElementById('minigame-box');
     const shopBox = document.getElementById('shop-box');
     const btnToggleMinigame = document.getElementById('btn-toggle-minigame');
@@ -1030,34 +1031,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCloseShop = document.getElementById('btn-close-shop');
 
     if (btnToggleMinigame && minigameBox && shopBox) {
-        btnToggleMinigame.addEventListener('click', () => {
+        btnToggleMinigame.addEventListener('click', (e) => {
+            e.preventDefault();
             minigameBox.classList.toggle('mobile-open');
-            shopBox.classList.remove('mobile-open'); // Bezárja a boltot, ha a játékot nyitod meg
+            shopBox.classList.remove('mobile-open');
         });
     }
 
     if (btnToggleShop && shopBox && minigameBox) {
-        btnToggleShop.addEventListener('click', () => {
+        btnToggleShop.addEventListener('click', (e) => {
+            e.preventDefault();
             shopBox.classList.toggle('mobile-open');
-            minigameBox.classList.remove('mobile-open'); // Bezárja a játékot, ha a boltot nyitod meg
+            minigameBox.classList.remove('mobile-open');
         });
     }
 
     if (btnCloseMinigame && minigameBox) {
-        btnCloseMinigame.addEventListener('click', () => {
+        btnCloseMinigame.addEventListener('click', (e) => {
+            e.preventDefault();
             minigameBox.classList.remove('mobile-open');
         });
     }
 
     if (btnCloseShop && shopBox) {
-        btnCloseShop.addEventListener('click', () => {
+        btnCloseShop.addEventListener('click', (e) => {
+            e.preventDefault();
             shopBox.classList.remove('mobile-open');
         });
     }
+}
 
-    // Rendszer automatikus indítása
-    SetBackground();
-    setInterval(SetBackground, 60 * 1000);
-    ResetSleepTimer();
-    setupDiscordActivity();
+    // Rendszer automatikus indítása a megfelelő sorrendben
+    try {
+        SetBackground();
+        setInterval(SetBackground, 60000); // Időjárás/háttér frissítés
+        ResetSleepTimer();
+        setupDiscordActivity();
+
+        // Azonnal meghívjuk a mobil gombok inicializálását
+        initMobilePanels();
+    } catch (error) {
+        console.error("Hiba az inicializálás során:", error);
+    }
 });
