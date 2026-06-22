@@ -765,7 +765,7 @@ body {
     .minigame-container, .Shop {
         display: none !important; 
         position: fixed !important;
-        top: 60px !important;
+        top: 110px !important;
         left: 0 !important;
         width: 100% !important;
         height: calc(100vh - 60px) !important;
@@ -792,7 +792,6 @@ body {
         padding: 8px !important;
         gap: 10px !important;
         box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
-        margin-bottom: 20px !important;
     }
 
     .mobile-toggle-btn {
@@ -911,5 +910,4 @@ body {
 /* Discord Mobile Safe Area */
 .discord-mobile.force-mobile .mobile-nav-bar {
     top: 50px !important;
-    margin-bottom: 20px !important;
 }
