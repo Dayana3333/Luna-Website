@@ -781,8 +781,8 @@ body {
     /* FELSŐ FIX MOBIL MENÜSÁV */
     .mobile-nav-bar {
         display: flex !important;
-        position: fixed !important;
-        top: 0 !important;
+        position: fixed;
+        top: 0;
         left: 0 !important;
         width: 100% !important;
         height: 60px !important;
@@ -912,8 +912,7 @@ body {
     top: 100px !important;
 }
 
-/*
+
 .discord-mobile.force-mobile body {
-    padding-top: 110px !important;
+    padding-top: 100px !important;
 }
-*/
