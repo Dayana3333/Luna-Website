@@ -782,7 +782,7 @@ body {
     .mobile-nav-bar {
         display: flex !important;
         position: fixed;
-        top: 0;
+        top: 100;
         left: 0 !important;
         width: 100% !important;
         height: 60px !important;
