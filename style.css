@@ -929,3 +929,14 @@ body {
 .discord-mobile.force-mobile .mobile-nav-bar{
     top:60px !important;
 }
+
+
+/* Discord mobile header overlap fix */
+.discord-mobile.force-mobile body{
+    padding-top: 170px !important;
+}
+
+.discord-mobile.force-mobile .mobile-nav-bar{
+    top: 110px !important;
+    z-index: 1000 !important;
+}
