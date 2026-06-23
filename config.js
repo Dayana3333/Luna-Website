@@ -275,6 +275,7 @@ let isPlaying = false;
 
 const radioAudio = new Audio('audio/lofi-music.mp3');
 radioAudio.loop = true;
+radioAudio.volume = 0.25;
 
 const ActivityCooldowns = {
     Feed: 0,
