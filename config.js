@@ -13,10 +13,11 @@ const Body = document.body;
 const Raccoon = document.querySelector('#Raccoon');
 
 let PetData = null;
-let Raccooins = 0;
+let Raccooins = null;
 let RelationshipPoints = 0;
 let currentSaveKey = null;
 let isSaving = false;
+let currentUser = { id: 'local_user', username: 'LocalUser' };
 
 // ==========================================
 // SUPABASE & DISCORD SDK KONFIGURÁCIÓ
@@ -63,6 +64,10 @@ const TOKEN_EXCHANGE_URL = isDiscordActivity
     ? `${window.location.origin}/cloudflare-api/api/token`
     : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/token`;
 
+const ACTION_URL = isDiscordActivity
+    ? `${window.location.origin}/cloudflare-api/api/action`
+    : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/action`;
+
 let discordSdk = null;
 
 try {
@@ -82,8 +87,8 @@ async function setupDiscordActivity() {
     setInterval(async () => {
         if (!currentSaveKey || isSaving) return;
         const { data, error } = await supabaseClient
-            .from('luna_data')
-            .select('*')
+            .from('pet_data')
+            .select('raccooin, relationship_points, name')
             .eq('guild_id', currentSaveKey)
             .single();
         if (error || !data) return;
@@ -125,6 +130,16 @@ async function setupDiscordActivity() {
         }
         await discordSdk.commands.authenticate({ access_token });
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
+        // Fetch the authenticated user's identity
+        try {
+            const userRes = await fetch("https://discord.com/api/users/@me", {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                currentUser = { id: userData.id, username: userData.username || userData.global_name || 'Unknown' };
+            }
+        } catch (e) { console.warn("Could not fetch user identity", e); }
         await updateDiscordPresence();
         FetchPetData();
         startPolling();
@@ -163,7 +178,7 @@ async function FetchPetData() {
     if (!currentSaveKey) return;
     try {
         let { data, error } = await supabaseClient
-            .from('luna_data')
+            .from('pet_data')
             .select('*')
             .eq('guild_id', currentSaveKey)
             .single();
@@ -180,12 +195,16 @@ async function FetchPetData() {
                     guild_id: currentSaveKey,
                     name: 'Luna',
                     raccooin: 100,
-                    relationship_points: 0
+                    relationship_points: 0,
+                    relationship_level_num: 1,
+                    relationship_level_name: 'Strangers',
+                    last_interaction_by_id: currentUser.id,
+                    last_interaction_by_name: currentUser.username,
                 }),
             });
 
             const { data: newPet, error: refetchError } = await supabaseClient
-                .from('luna_data')
+                .from('pet_data')
                 .select('*')
                 .eq('guild_id', currentSaveKey)
                 .single();
@@ -210,13 +229,15 @@ async function FetchPetData() {
     }
 }
 
-async function SavePetData() {
+async function SavePetData(ctx = {}) {
     if (!currentSaveKey) return;
     isSaving = true;
     try {
         const SAVE_URL = isDiscordActivity
             ? `${window.location.origin}/cloudflare-api/api/save`
             : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/save`;
+
+        const currentLevel = GetCurrentLevel(RelationshipPoints);
 
         const response = await fetch(SAVE_URL, {
             method: 'POST',
@@ -225,7 +246,48 @@ async function SavePetData() {
                 guild_id: currentSaveKey,
                 raccooin: Raccooins,
                 relationship_points: RelationshipPoints,
-                name: document.querySelector('#PetName')?.innerText || 'Luna'
+                relationship_level_num: currentLevel.level,
+                relationship_level_name: currentLevel.name,
+                name: document.querySelector('#PetName')?.innerText || 'Luna',
+                last_interaction_type:    ctx.action_type    || null,
+                last_interaction_by_id:   currentUser.id,
+                last_interaction_by_name: currentUser.username,
+                caused_level_up:          ctx.caused_level_up || false,
+                last_level_up_by_id:      ctx.caused_level_up ? currentUser.id        : undefined,
+                last_level_up_by_name:    ctx.caused_level_up ? currentUser.username  : undefined,
+                inc_feed:           ctx.inc_feed          || 0,
+                inc_water:          ctx.inc_water         || 0,
+                inc_pet:            ctx.inc_pet           || 0,
+                inc_items:          ctx.inc_items         || 0,
+                inc_bubble_tea:     ctx.inc_bubble_tea    || 0,
+                inc_steamed_buns:   ctx.inc_steamed_buns  || 0,
+                inc_ramen:          ctx.inc_ramen         || 0,
+                inc_tictactoe_played: ctx.inc_tictactoe_played || 0,
+                inc_tictactoe_won:  ctx.inc_tictactoe_won  || 0,
+                inc_tictactoe_lost: ctx.inc_tictactoe_lost || 0,
+                inc_memory_played:  ctx.inc_memory_played  || 0,
+                inc_memory_won:     ctx.inc_memory_won     || 0,
+                inc_memory_lost:    ctx.inc_memory_lost    || 0,
+                inc_sushi_played:   ctx.inc_sushi_played   || 0,
+                inc_sushi_rc:       ctx.inc_sushi_rc       || 0,
+                inc_scramble_played:ctx.inc_scramble_played || 0,
+                inc_scramble_won:   ctx.inc_scramble_won   || 0,
+                inc_scramble_lost:  ctx.inc_scramble_lost  || 0,
+                inc_catcher_played: ctx.inc_catcher_played || 0,
+                inc_catcher_rc:     ctx.inc_catcher_rc     || 0,
+                inc_catcher_rp:     ctx.inc_catcher_rp     || 0,
+                inc_fortune_played: ctx.inc_fortune_played || 0,
+                inc_fortune_rc:     ctx.inc_fortune_rc     || 0,
+                inc_fortune_rp:     ctx.inc_fortune_rp     || 0,
+                inc_rp_feed:        ctx.inc_rp_feed        || 0,
+                inc_rp_water:       ctx.inc_rp_water       || 0,
+                inc_rp_pet:         ctx.inc_rp_pet         || 0,
+                inc_rp_items:       ctx.inc_rp_items       || 0,
+                inc_rp_minigames:   ctx.inc_rp_minigames   || 0,
+                inc_rc_spent:       ctx.inc_rc_spent       || 0,
+                inc_rc_earned:      ctx.inc_rc_earned      || 0,
+                current_rc: Raccooins,
+                current_rp: RelationshipPoints,
             }),
         });
 
@@ -234,6 +296,45 @@ async function SavePetData() {
         console.error('Failed to save pet data:', err);
     } finally {
         isSaving = false;
+    }
+}
+
+// ==========================================
+// ACTION LOGGER
+// ==========================================
+
+async function LogAction({
+    action_type, action_detail = null, result = null,
+    rp_gained = 0, rc_spent = 0, rc_earned = 0,
+    caused_level_up = false,
+    level_name_before = null, level_name_after = null,
+    relationship_level_before = null, relationship_level_after = null,
+}) {
+    if (!currentSaveKey) return;
+    try {
+        const levelBefore = relationship_level_before ?? GetCurrentLevel(RelationshipPoints - rp_gained)?.level ?? null;
+        const levelAfter  = relationship_level_after  ?? GetCurrentLevel(RelationshipPoints)?.level ?? null;
+        await fetch(ACTION_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                guild_id: currentSaveKey,
+                user_id: currentUser.id,
+                username: currentUser.username,
+                action_type, action_detail, result,
+                rp_gained, rc_spent, rc_earned,
+                pet_rp_before: RelationshipPoints - rp_gained,
+                pet_rp_after: RelationshipPoints,
+                pet_rc_before: Raccooins + rc_spent - rc_earned,
+                pet_rc_after: Raccooins,
+                relationship_level_before: levelBefore,
+                relationship_level_after: levelAfter,
+                level_name_before, level_name_after,
+                caused_level_up,
+            }),
+        });
+    } catch (err) {
+        console.warn('LogAction failed (non-critical):', err);
     }
 }
 
@@ -477,7 +578,32 @@ function Activity(ActionType) {
         }
     }
 
-    SavePetData();
+    const levelBefore = GetCurrentLevel(RelationshipPoints - (ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1));
+    const levelAfter  = GetCurrentLevel(RelationshipPoints);
+    const causedLevelUp = levelAfter.level > levelBefore.level;
+    const rpGained = ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1;
+
+    const ctx = {
+        action_type: ActionType,
+        caused_level_up: causedLevelUp,
+        inc_feed:    ActionType === 'Feed'  ? 1 : 0,
+        inc_water:   ActionType === 'Water' ? 1 : 0,
+        inc_pet:     ActionType === 'Pet'   ? 1 : 0,
+        inc_rp_feed:  ActionType === 'Feed'  ? rpGained : 0,
+        inc_rp_water: ActionType === 'Water' ? rpGained : 0,
+        inc_rp_pet:   ActionType === 'Pet'   ? rpGained : 0,
+    };
+
+    SavePetData(ctx);
+    LogAction({
+        action_type: ActionType,
+        rp_gained: rpGained,
+        caused_level_up: causedLevelUp,
+        level_name_before: levelBefore.name,
+        level_name_after: levelAfter.name,
+        relationship_level_before: levelBefore.level,
+        relationship_level_after: levelAfter.level,
+    });
 }
 
 // ==========================================
@@ -521,9 +647,35 @@ function BuyItem(ItemName, ItemPrice) {
     let RelationshipPointReward = Math.floor(ItemPrice * 1.5);
     RelationshipPoints += RelationshipPointReward;
 
+    const levelBefore = GetCurrentLevel(RelationshipPoints - RelationshipPointReward);
+    const levelAfter  = GetCurrentLevel(RelationshipPoints);
+    const causedLevelUp = levelAfter.level > levelBefore.level;
+
+    const itemKey = ItemName === 'BubbleTea' ? 'inc_bubble_tea' : ItemName === 'SteamedBuns' ? 'inc_steamed_buns' : 'inc_ramen';
+    const ctx = {
+        action_type: 'BuyItem',
+        caused_level_up: causedLevelUp,
+        inc_items: 1,
+        [itemKey]: 1,
+        inc_rp_items: RelationshipPointReward,
+        inc_rc_spent: ItemPrice,
+    };
+
     UpdateUI();
     TriggerLunaJoy();
-    SavePetData();
+    SavePetData(ctx);
+    LogAction({
+        action_type: 'BuyItem',
+        action_detail: ItemName,
+        result: ItemName,
+        rp_gained: RelationshipPointReward,
+        rc_spent: ItemPrice,
+        caused_level_up: causedLevelUp,
+        level_name_before: levelBefore.name,
+        level_name_after: levelAfter.name,
+        relationship_level_before: levelBefore.level,
+        relationship_level_after: levelAfter.level,
+    });
 }
 
 function TriggerLunaJoy() {
@@ -605,7 +757,7 @@ function playerMove(idx) {
     document.querySelectorAll('.ttt-cell')[idx].style.color = "#ff80b5";
     if (checkTTTWin("X")) {
         document.getElementById('ttt-status').innerText = "🎉 You Won! +50RC";
-        Raccooins += 50; UpdateUI(); SavePetData(); tttActive = false; return;
+        Raccooins += 50; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_tictactoe_played: 1, inc_tictactoe_won: 1, inc_rc_earned: 50 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'TicTacToe', result: 'win', rc_earned: 50 }); tttActive = false; return;
     }
     if (tttBoard.every(c => c !== "")) { document.getElementById('ttt-status').innerText = "🤝 Draw!"; return; }
     tttActive = false;
@@ -673,7 +825,7 @@ function flipCard(card) {
             flippedCards = [];
             if (matchedCount === memoryItems.length) {
                 document.getElementById('memory-status').innerText = "🎉 Cleared! +80RC";
-                Raccooins += 80; UpdateUI(); SavePetData();
+                Raccooins += 80; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_memory_played: 1, inc_memory_won: 1, inc_rc_earned: 80 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'MemoryMatch', result: 'win', rc_earned: 80 });
             }
         } else {
             document.getElementById('memory-status').innerText = "❌ No match!";
@@ -712,7 +864,7 @@ function startSushiGame() {
             document.getElementById('sushi-target').style.display = "none";
             let reward = sushiScore * 5;
             document.getElementById('sushi-status').innerText = `Finished! Gained +${reward}RC`;
-            Raccooins += reward; UpdateUI(); SavePetData();
+            Raccooins += reward; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_sushi_played: 1, inc_sushi_rc: reward, inc_rc_earned: reward }); LogAction({ action_type: 'MinigamePlay', action_detail: 'SushiTap', result: 'SushiTap', rc_earned: reward });
         }
     }, 1000);
 }
@@ -748,7 +900,7 @@ function checkScrambleGuess() {
     let guess = document.getElementById('scramble-input').value.toUpperCase().trim();
     if (guess === currentWord) {
         document.getElementById('scramble-status').innerText = "🎉 Correct! +60RC";
-        Raccooins += 60; UpdateUI(); SavePetData();
+        Raccooins += 60; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_scramble_played: 1, inc_scramble_won: 1, inc_rc_earned: 60 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'WordScramble', result: 'WordScrambleWin', rc_earned: 60 });
         startCooldown("scramble-submit-btn", MINIGAME_COOLDOWN_MS, "Submit");
         setTimeout(nextScramble, 1200);
     } else {
@@ -868,7 +1020,8 @@ function endCatcherGame() {
     }
     
     UpdateUI();
-    SavePetData();
+    SavePetData({ action_type: 'MinigamePlay', inc_catcher_played: 1, inc_catcher_rc: prizeRC, inc_catcher_rp: prizeRP, inc_rc_earned: prizeRC, inc_rp_minigames: prizeRP });
+    LogAction({ action_type: 'MinigamePlay', action_detail: 'CookieCatcher', result: 'CookieCatcher', rc_earned: prizeRC, rp_gained: prizeRP });
 }
 
 // ---- 6. FORTUNE COOKIE ----
@@ -912,7 +1065,8 @@ function clickFortuneCookie() {
             Raccooins += prizeRC;
             RelationshipPoints += prizeRP;
             UpdateUI();
-            SavePetData();
+            SavePetData({ action_type: 'MinigamePlay', inc_fortune_played: 1, inc_fortune_rc: prizeRC, inc_fortune_rp: prizeRP, inc_rc_earned: prizeRC, inc_rp_minigames: prizeRP });
+            LogAction({ action_type: 'MinigamePlay', action_detail: 'FortuneCookie', result: 'FortuneCookie', rc_earned: prizeRC, rp_gained: prizeRP });
             if (resetBtn) resetBtn.style.display = 'inline-block';
         }, 400);
     }
