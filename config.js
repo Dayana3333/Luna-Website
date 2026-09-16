@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ResetSleepTimer();
         setupDiscordActivity();
 
-        // Mmobil gombok inicializálása
+        // Mobil gombok inicializálása
         initMobilePanels();
     } catch (error) {
         console.error("Hiba az inicializálás során:", error);
