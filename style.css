@@ -132,7 +132,7 @@ body {
   transition: transform 0.2s ease-in-out;
 }
 
-/* Csak akkor lélegzik, ha nem csinál semmit (idle) */
+/* Csak akkor lélegzik ha nem csinál semmit (idle) */
 .pet-idle {
   animation: breathe 3s ease-in-out infinite;
 }
@@ -352,7 +352,7 @@ body {
   color: #f390a0;
 }
 
-/* --- MINIJÁTÉK PANEL ALAPJA (BAL OLDAL) --- */
+/* --- MINIJÁTÉK PANEL ALAPJA  --- */
 .minigame-container {
     position: absolute;
     left: 20px;
@@ -688,22 +688,21 @@ body {
 /* --- MOBIL ÉS KISMÉRETŰ KIJELZŐK STÍLUSAI (max-width: 768px) --- */
 @media screen and (max-width: 768px) {
     
-    /* Flexbox elrendezések egymás alá törése */
+    /* Flexbox elrendezések egymás alá */
     body, .main-container, .game-container, .shop-container {
         flex-direction: column !important;
         align-items: center !important;
         padding: 10px !important;
     }
 
-    /* Fix szélességű panelek folyékonnyá tétele */
     #minigame-box, .panel, .ShopPanel, .StatusPanel {
         width: 100% !important;
-        max-width: 400px !important; /* Maximális szélesség mobilon, hogy ne nyúljon túl szélesre */
+        max-width: 400px !important; 
         margin: 10px 0 !important;
         box-sizing: border-box;
     }
 
-    /* Bolt (Shop) kártyák elrendezése mobilon */
+    /* Bolt kártyák elrendezése mobilon */
     .ShopGrid, .GridContainer {
         display: flex !important;
         flex-direction: column !important;
@@ -726,16 +725,15 @@ body {
         font-size: 1.2rem !important;
     }
 
-    /* Interaktív zónák (pl. játékterek, gombok) átméretezése, ha szükséges */
+    /* Interaktív zónák átméretezése */
     .catcher-area, .cookie-click-zone {
-        margin: 0 auto !important; /* Középre igazítás */
+        margin: 0 auto !important; 
     }
 
-    /* Gombok érintőképernyő-barát méretezése (könnyebb legyen rányomni) */
     button, .BuyButton, .nav-btn {
         padding: 12px 20px !important;
         font-size: 1rem !important;
-        min-height: 44px; /* Ajánlott minimális érintési felület */
+        min-height: 44px; 
     }
 }
 
@@ -758,10 +756,9 @@ body {
     }
 
     body, button, .mobile-toggle-btn, .panel-close-btn, .Button, .BuyButton {
-        touch-action: manipulation !important; /* Teljesen letiltja a Discord dupla kattintásos nagyítási hibáját */
+        touch-action: manipulation !important; 
     }
 
-    /* Asztali elrendezésben lévő panelek alapértelmezett TELJES ELREJTÉSE */
     .minigame-container, .Shop {
         display: none !important; 
         position: fixed !important;
@@ -806,7 +803,7 @@ body {
         cursor: pointer !important;
     }
 
-    /* KÖZÉPSŐ JÁTÉKTÉR (Raccoon + Főgombok) */
+    /* KÖZÉPSŐ JÁTÉKTÉR */
     .PetArea {
         width: 100% !important;
         max-width: 400px !important;
@@ -847,13 +844,12 @@ body {
         white-space: nowrap !important;
     }
 
-    /* --- HA JÁTÉKOS MEGNYITJA A PANELDET (JS átkapcsolja a mobile-open-t) --- */
+    /* Telefonos megnyitás esetén */
     .minigame-container.mobile-open, .Shop.mobile-open {
         display: flex !important; 
         flex-direction: column !important;
     }
 
-    /* Mobil bezáró (X) gomb elrendezése a panelek tetején */
     .panel-close-btn {
         display: flex !important;
         position: absolute !important;
@@ -892,7 +888,7 @@ body {
         align-items: center !important;
     }
 
-    /* Rádió elhelyezése, hogy ne zavarja a fő gombok */
+    /* Rádió elhelyezése */
     .radio-container {
         position: fixed !important;
         bottom: 15px !important;
@@ -907,7 +903,6 @@ body {
 }
 
 /* ===== Discord Activity responsive fix ===== */
-/* Discord Mobile Safe Area */
 .discord-mobile.force-mobile .mobile-nav-bar {
     top: 50px !important;
 }

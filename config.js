@@ -27,7 +27,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient;
 
 // Backend that exchanges an OAuth2 "code" for an access_token. Needs the
-// Discord client secret, which can never live in this frontend file — that
+// Discord client secret, which can never live in this frontend file that
 // exchange happens server-side on Kranem instead. Inside Discord this must
 // go through the proxy mapping above (raw external URLs get CSP-blocked).
 const KRANEM_DIRECT_URL = "https://luna-token-exchange.yourname.workers.dev";
@@ -37,12 +37,9 @@ const isDiscordActivity =
     window.location.search.includes("instance_id=");
 
 // Inside Discord, all network requests must go through Discord's proxy
-// (discordsays.com) instead of hitting external domains directly — that's
-// what the CSP "connect-src" error was about. patchUrlMappings rewrites
-// fetch() calls under the hood so the Supabase client code below doesn't
-// need to change at all; it just needs to be told to use a relative path
-// instead of the real Supabase URL when running as an Activity. The same
-// applies to the Kranem backend used for the OAuth2 token exchange.
+// (discordsays.com) instead of hitting external domains directly. 
+// patchUrlMappings rewrites fetch() calls for Supabase-
+//  The same applies to the Kranem backend used for the OAuth2 token exchange.
 if (isDiscordActivity) {
     patchUrlMappings([
         { prefix: "/supabase-api", target: "borusbjllkypavkoujqk.supabase.co" },
@@ -281,7 +278,6 @@ const ActivityCooldowns = {
     Water: 0
 };
 
-// index 4 = Cookie Catcher, no cooldown
 const MinigameCooldowns = [0, 0, 0, 0, 0, 0];
 const MINIGAME_COOLDOWN_MS = 60000;
 const NO_COOLDOWN_GAMES = [4]; // Cookie Catcher index
@@ -1058,14 +1054,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Rendszer automatikus indítása a megfelelő sorrendben
+    // Rendszer automatikus indítása
     try {
         SetBackground();
         setInterval(SetBackground, 60000); // Időjárás/háttér frissítés
         ResetSleepTimer();
         setupDiscordActivity();
 
-        // Azonnal meghívjuk a mobil gombok inicializálását
+        // Mmobil gombok inicializálása
         initMobilePanels();
     } catch (error) {
         console.error("Hiba az inicializálás során:", error);
