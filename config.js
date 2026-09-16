@@ -489,7 +489,6 @@ function toggleRadio() {
     if (!radioStatus) return;
 
     if (radioAudio.paused) {
-        // Ha nem szól a zene, megpróbáljuk elindítani
         radioAudio.play()
             .then(() => {
                 radioStatus.textContent = "ON";
@@ -499,7 +498,6 @@ function toggleRadio() {
                 console.error("Discord Audio lejátszási hiba:", error);
             });
     } else {
-        // Ha már szól, akkor gombnyomásra megállítjuk
         radioAudio.pause();
         radioStatus.textContent = "OFF";
         radioStatus.style.color = "#ff5555"; 
