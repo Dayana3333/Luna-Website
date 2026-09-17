@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "./vendor/discord-sdk.js";
+import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=65";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -13,10 +13,11 @@ const Body = document.body;
 const Raccoon = document.querySelector('#Raccoon');
 
 let PetData = null;
-let Raccooins = 0;
+let Raccooins = null;
 let RelationshipPoints = 0;
 let currentSaveKey = null;
 let isSaving = false;
+let currentUser = { id: 'local_user', username: 'LocalUser' };
 
 // ==========================================
 // SUPABASE & DISCORD SDK KONFIGURÁCIÓ
@@ -60,6 +61,10 @@ const TOKEN_EXCHANGE_URL = isDiscordActivity
     ? `${window.location.origin}/cloudflare-api/api/token`
     : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/token`;
 
+const ACTION_URL = isDiscordActivity
+    ? `${window.location.origin}/cloudflare-api/api/action`
+    : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/action`;
+
 let discordSdk = null;
 
 try {
@@ -86,28 +91,21 @@ let currentShopSort = 'none';
 
 async function setupDiscordActivity() {
     const startPolling = () => {
-    setInterval(async () => {
-        if (!currentSaveKey || isSaving) return;
-        const { data, error } = await supabaseClient
-            .from('pet_data')
-            .select('*')
-            .eq('guild_id', currentSaveKey)
-            .single();
-        if (error || !data) return;
-        Raccooins = data.raccooin ?? 100;
-        RelationshipPoints = data.relationship_points || 0;
-        // IMPORTANT: Don't overwrite pet name while user is editing it
-        const petNameEl = document.querySelector('#PetName');
-        if (petNameEl && petNameEl !== document.activeElement) {
-            // Only update if the field is empty (lost data recovery)
-            const currentName = petNameEl.textContent.trim();
-            if (!currentName) {
-                petNameEl.innerText = data.name;
-            }
-        }
-        UpdateUI();
-    }, 5000);
-};
+        setInterval(async () => {
+            if (!currentSaveKey || isSaving) return;
+            const { data, error } = await supabaseClient
+                .from('pet_data')
+                .select('*')
+                .eq('guild_id', currentSaveKey)
+                .single();
+            if (error || !data) return;
+            Raccooins = data.raccooin ?? 100;
+            RelationshipPoints = data.relationship_points || 0;
+            const petNameEl = document.querySelector('#PetName');
+            if (petNameEl) petNameEl.innerText = data.name;
+            UpdateUI();
+        }, 5000);
+    };
 
     if (!discordSdk) {
         console.log("Local mode — no Discord SDK.");
@@ -139,6 +137,16 @@ async function setupDiscordActivity() {
         }
         await discordSdk.commands.authenticate({ access_token });
         currentSaveKey = discordSdk.guildId || discordSdk.channelId || "default_local_testing";
+        // Fetch the authenticated user's identity
+        try {
+            const userRes = await fetch("https://discord.com/api/users/@me", {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+            if (userRes.ok) {
+                const userData = await userRes.json();
+                currentUser = { id: userData.id, username: userData.username || userData.global_name || 'Unknown' };
+            }
+        } catch (e) { console.warn("Could not fetch user identity", e); }
         await updateDiscordPresence();
         FetchPetData();
         startPolling();
@@ -154,12 +162,12 @@ async function updateDiscordPresence() {
     try {
         await discordSdk.commands.setActivity({
             activity: {
-                type: 0, 
+                type: 0,
                 details: "Chilling with Luna 🦝",
                 state: "Virtual Pet Activity",
                 assets: {
-                    large_image: "embedded_cover", 
-                    large_text: "Luna" 
+                    large_image: "embedded_cover",
+                    large_text: "Luna"
                 }
             }
         });
@@ -194,7 +202,11 @@ async function FetchPetData() {
                     guild_id: currentSaveKey,
                     name: 'Luna',
                     raccooin: 100,
-                    relationship_points: 0
+                    relationship_points: 0,
+                    relationship_level_num: 1,
+                    relationship_level_name: 'Strangers',
+                    last_interaction_by_id: currentUser.id,
+                    last_interaction_by_name: currentUser.username,
                 }),
             });
 
@@ -224,13 +236,15 @@ async function FetchPetData() {
     }
 }
 
-async function SavePetData() {
+async function SavePetData(ctx = {}) {
     if (!currentSaveKey) return;
     isSaving = true;
     try {
         const SAVE_URL = isDiscordActivity
             ? `${window.location.origin}/cloudflare-api/api/save`
             : `https://luna-token-exchange.nemethkovacsrichard.workers.dev/api/save`;
+
+        const currentLevel = GetCurrentLevel(RelationshipPoints);
 
         const response = await fetch(SAVE_URL, {
             method: 'POST',
@@ -239,7 +253,48 @@ async function SavePetData() {
                 guild_id: currentSaveKey,
                 raccooin: Raccooins,
                 relationship_points: RelationshipPoints,
-                name: document.querySelector('#PetName')?.innerText || 'Luna'
+                relationship_level_num: currentLevel.level,
+                relationship_level_name: currentLevel.name,
+                name: document.querySelector('#PetName')?.innerText || 'Luna',
+                last_interaction_type: ctx.action_type || null,
+                last_interaction_by_id: currentUser.id,
+                last_interaction_by_name: currentUser.username,
+                caused_level_up: ctx.caused_level_up || false,
+                last_level_up_by_id: ctx.caused_level_up ? currentUser.id : undefined,
+                last_level_up_by_name: ctx.caused_level_up ? currentUser.username : undefined,
+                inc_feed: ctx.inc_feed || 0,
+                inc_water: ctx.inc_water || 0,
+                inc_pet: ctx.inc_pet || 0,
+                inc_items: ctx.inc_items || 0,
+                inc_bubble_tea: ctx.inc_bubble_tea || 0,
+                inc_steamed_buns: ctx.inc_steamed_buns || 0,
+                inc_ramen: ctx.inc_ramen || 0,
+                inc_tictactoe_played: ctx.inc_tictactoe_played || 0,
+                inc_tictactoe_won: ctx.inc_tictactoe_won || 0,
+                inc_tictactoe_lost: ctx.inc_tictactoe_lost || 0,
+                inc_memory_played: ctx.inc_memory_played || 0,
+                inc_memory_won: ctx.inc_memory_won || 0,
+                inc_memory_lost: ctx.inc_memory_lost || 0,
+                inc_sushi_played: ctx.inc_sushi_played || 0,
+                inc_sushi_rc: ctx.inc_sushi_rc || 0,
+                inc_scramble_played: ctx.inc_scramble_played || 0,
+                inc_scramble_won: ctx.inc_scramble_won || 0,
+                inc_scramble_lost: ctx.inc_scramble_lost || 0,
+                inc_catcher_played: ctx.inc_catcher_played || 0,
+                inc_catcher_rc: ctx.inc_catcher_rc || 0,
+                inc_catcher_rp: ctx.inc_catcher_rp || 0,
+                inc_fortune_played: ctx.inc_fortune_played || 0,
+                inc_fortune_rc: ctx.inc_fortune_rc || 0,
+                inc_fortune_rp: ctx.inc_fortune_rp || 0,
+                inc_rp_feed: ctx.inc_rp_feed || 0,
+                inc_rp_water: ctx.inc_rp_water || 0,
+                inc_rp_pet: ctx.inc_rp_pet || 0,
+                inc_rp_items: ctx.inc_rp_items || 0,
+                inc_rp_minigames: ctx.inc_rp_minigames || 0,
+                inc_rc_spent: ctx.inc_rc_spent || 0,
+                inc_rc_earned: ctx.inc_rc_earned || 0,
+                current_rc: Raccooins,
+                current_rp: RelationshipPoints,
             }),
         });
 
@@ -252,18 +307,57 @@ async function SavePetData() {
 }
 
 // ==========================================
+// ACTION LOGGER
+// ==========================================
+
+async function LogAction({
+    action_type, action_detail = null, result = null,
+    rp_gained = 0, rc_spent = 0, rc_earned = 0,
+    caused_level_up = false,
+    level_name_before = null, level_name_after = null,
+    relationship_level_before = null, relationship_level_after = null,
+}) {
+    if (!currentSaveKey) return;
+    try {
+        const levelBefore = relationship_level_before ?? GetCurrentLevel(RelationshipPoints - rp_gained)?.level ?? null;
+        const levelAfter = relationship_level_after ?? GetCurrentLevel(RelationshipPoints)?.level ?? null;
+        await fetch(ACTION_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                guild_id: currentSaveKey,
+                user_id: currentUser.id,
+                username: currentUser.username,
+                action_type, action_detail, result,
+                rp_gained, rc_spent, rc_earned,
+                pet_rp_before: RelationshipPoints - rp_gained,
+                pet_rp_after: RelationshipPoints,
+                pet_rc_before: Raccooins + rc_spent - rc_earned,
+                pet_rc_after: Raccooins,
+                relationship_level_before: levelBefore,
+                relationship_level_after: levelAfter,
+                level_name_before, level_name_after,
+                caused_level_up,
+            }),
+        });
+    } catch (err) {
+        console.warn('LogAction failed (non-critical):', err);
+    }
+}
+
+// ==========================================
 // RELATIONSHIP SZINTEK
 // ==========================================
 
 const RelationshipLevels = [
-    { level: 1, name: "Strangers",     threshold: 0 },
+    { level: 1, name: "Strangers", threshold: 0 },
     { level: 2, name: "Acquaintances", threshold: 1000 },
-    { level: 3, name: "Friends",       threshold: 5000 },
-    { level: 4, name: "Good Friends",  threshold: 15000 },
+    { level: 3, name: "Friends", threshold: 5000 },
+    { level: 4, name: "Good Friends", threshold: 15000 },
     { level: 5, name: "Close Friends", threshold: 40000 },
-    { level: 6, name: "Besto Frendo",  threshold: 100000 },
-    { level: 7, name: "Inseparable",   threshold: 250000 },
-    { level: 8, name: "Soulmates",     threshold: 600000 }
+    { level: 6, name: "Besto Frendo", threshold: 100000 },
+    { level: 7, name: "Inseparable", threshold: 250000 },
+    { level: 8, name: "Soulmates", threshold: 600000 }
 ];
 
 function GetCurrentLevel(points) {
@@ -289,6 +383,7 @@ let isPlaying = false;
 
 const radioAudio = new Audio('audio/lofi-music.mp3');
 radioAudio.loop = true;
+radioAudio.volume = 0.25;
 
 const ActivityCooldowns = {
     Feed: 0,
@@ -374,9 +469,9 @@ function SetBackground() {
             document.documentElement.style.setProperty('--text-accent', '#f3da90');
             document.documentElement.style.setProperty('--pet-name-color', '#f3c4d8');
         } else {
-            document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #1b263b 0%, #0d1b2a 50%, #010811 100%)');
+            document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #1b264b 0%, #0d1b2a 50%, #010811 100%)');
             document.documentElement.style.setProperty('--panel-border', '#415a77');
-            document.documentElement.style.setProperty('--button-bg', 'linear-gradient(135deg, #415a77, #1b263b)');
+            document.documentElement.style.setProperty('--button-bg', 'linear-gradient(135deg, #415a77, #1b264b)');
             document.documentElement.style.setProperty('--button-border', '#778da9');
             document.documentElement.style.setProperty('--text-accent', '#e0e1dd');
             document.documentElement.style.setProperty('--pet-name-color', '#ffb3c6');
@@ -424,7 +519,7 @@ function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
     if (Raccoon) {
-        Raccoon.src = 'imgs/raccoon.png';
+        Raccoon.src = 'imgs/raccoon.png?v=65';
         Raccoon.classList.add('pet-idle');
     }
 }
@@ -443,7 +538,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
     ActivityTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = 'imgs/raccoon.png';
+            Raccoon.src = 'imgs/raccoon.png?v=65';
             if (CssClass) Raccoon.classList.remove(CssClass);
             Raccoon.classList.add('pet-idle');
         }
@@ -489,7 +584,32 @@ function Activity(ActionType) {
         }
     }
 
-    SavePetData();
+    const levelBefore = GetCurrentLevel(RelationshipPoints - (ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1));
+    const levelAfter = GetCurrentLevel(RelationshipPoints);
+    const causedLevelUp = levelAfter.level > levelBefore.level;
+    const rpGained = ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1;
+
+    const ctx = {
+        action_type: ActionType,
+        caused_level_up: causedLevelUp,
+        inc_feed: ActionType === 'Feed' ? 1 : 0,
+        inc_water: ActionType === 'Water' ? 1 : 0,
+        inc_pet: ActionType === 'Pet' ? 1 : 0,
+        inc_rp_feed: ActionType === 'Feed' ? rpGained : 0,
+        inc_rp_water: ActionType === 'Water' ? rpGained : 0,
+        inc_rp_pet: ActionType === 'Pet' ? rpGained : 0,
+    };
+
+    SavePetData(ctx);
+    LogAction({
+        action_type: ActionType,
+        rp_gained: rpGained,
+        caused_level_up: causedLevelUp,
+        level_name_before: levelBefore.name,
+        level_name_after: levelAfter.name,
+        relationship_level_before: levelBefore.level,
+        relationship_level_after: levelAfter.level,
+    });
 }
 
 // ==========================================
@@ -498,14 +618,14 @@ function Activity(ActionType) {
 
 function toggleRadio() {
     const radioStatus = document.getElementById('radio-status');
-    
+
     if (!radioStatus) return;
 
     if (radioAudio.paused) {
         radioAudio.play()
             .then(() => {
                 radioStatus.textContent = "ON";
-                radioStatus.style.color = "#55ff55"; 
+                radioStatus.style.color = "#55ff55";
             })
             .catch(error => {
                 console.error("Discord Audio lejátszási hiba:", error);
@@ -513,7 +633,7 @@ function toggleRadio() {
     } else {
         radioAudio.pause();
         radioStatus.textContent = "OFF";
-        radioStatus.style.color = "#ff5555"; 
+        radioStatus.style.color = "#ff5555";
     }
 }
 
@@ -531,9 +651,35 @@ function BuyItem(ItemName, ItemPrice) {
     let RelationshipPointReward = Math.floor(ItemPrice * 1.5);
     RelationshipPoints += RelationshipPointReward;
 
+    const levelBefore = GetCurrentLevel(RelationshipPoints - RelationshipPointReward);
+    const levelAfter = GetCurrentLevel(RelationshipPoints);
+    const causedLevelUp = levelAfter.level > levelBefore.level;
+
+    const itemKey = ItemName === 'BubbleTea' ? 'inc_bubble_tea' : ItemName === 'SteamedBuns' ? 'inc_steamed_buns' : 'inc_ramen';
+    const ctx = {
+        action_type: 'BuyItem',
+        caused_level_up: causedLevelUp,
+        inc_items: 1,
+        [itemKey]: 1,
+        inc_rp_items: RelationshipPointReward,
+        inc_rc_spent: ItemPrice,
+    };
+
     UpdateUI();
     TriggerLunaJoy();
-    SavePetData();
+    SavePetData(ctx);
+    LogAction({
+        action_type: 'BuyItem',
+        action_detail: ItemName,
+        result: ItemName,
+        rp_gained: RelationshipPointReward,
+        rc_spent: ItemPrice,
+        caused_level_up: causedLevelUp,
+        level_name_before: levelBefore.name,
+        level_name_after: levelAfter.name,
+        relationship_level_before: levelBefore.level,
+        relationship_level_after: levelAfter.level,
+    });
 }
 
 // ==========================================
@@ -648,10 +794,10 @@ function UpdateUI() {
 
     if (coinEl) coinEl.innerText = Raccooins.toLocaleString() + 'RC';
     if (relEl) relEl.innerText = RelationshipPoints.toLocaleString() + 'RP';
-    
+
     const CurrentLevel = GetCurrentLevel(RelationshipPoints);
     if (lvlEl) lvlEl.innerText = CurrentLevel.name;
-    
+
     checkMinigameUnlock(RelationshipPoints);
 }
 
@@ -708,7 +854,7 @@ function playerMove(idx) {
     document.querySelectorAll('.ttt-cell')[idx].style.color = "#ff80b5";
     if (checkTTTWin("X")) {
         document.getElementById('ttt-status').innerText = "🎉 You Won! +50RC";
-        Raccooins += 50; UpdateUI(); SavePetData(); tttActive = false; return;
+        Raccooins += 50; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_tictactoe_played: 1, inc_tictactoe_won: 1, inc_rc_earned: 50 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'TicTacToe', result: 'win', rc_earned: 50 }); tttActive = false; return;
     }
     if (tttBoard.every(c => c !== "")) { document.getElementById('ttt-status').innerText = "🤝 Draw!"; return; }
     tttActive = false;
@@ -731,7 +877,7 @@ function playerMove(idx) {
 }
 
 function checkTTTWin(s) {
-    const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    const w = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
     return w.some(c => c.every(i => tttBoard[i] === s));
 }
 
@@ -744,7 +890,7 @@ function resetTTT() {
 
 // ---- 2. MEMORY MATCH ----
 
-let memoryItems = ['🧋','🧋','🥟','🥟','🍜','🍜','🍣','🍣','🍤','🍤','🍡','🍡','🥞','🥞','🍊','🍊'];
+let memoryItems = ['🧋', '🧋', '🥟', '🥟', '🍜', '🍜', '🍣', '🍣', '🍤', '🍤', '🍡', '🍡', '🥞', '🥞', '🍊', '🍊'];
 let flippedCards = [];
 let matchedCount = 0;
 
@@ -776,7 +922,7 @@ function flipCard(card) {
             flippedCards = [];
             if (matchedCount === memoryItems.length) {
                 document.getElementById('memory-status').innerText = "🎉 Cleared! +80RC";
-                Raccooins += 80; UpdateUI(); SavePetData();
+                Raccooins += 80; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_memory_played: 1, inc_memory_won: 1, inc_rc_earned: 80 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'MemoryMatch', result: 'win', rc_earned: 80 });
             }
         } else {
             document.getElementById('memory-status').innerText = "❌ No match!";
@@ -799,7 +945,7 @@ function restartMemoryGame() {
 let sushiTimer;
 let sushiScore = 0;
 let sushiTimeLeft = 15;
-const goodFoods = ['🍣','🥟','🍜','🧋','🍡','🍤'];
+const goodFoods = ['🍣', '🥟', '🍜', '🧋', '🍡', '🍤'];
 
 function startSushiGame() {
     clearInterval(sushiTimer);
@@ -815,7 +961,7 @@ function startSushiGame() {
             document.getElementById('sushi-target').style.display = "none";
             let reward = sushiScore * 5;
             document.getElementById('sushi-status').innerText = `Finished! Gained +${reward}RC`;
-            Raccooins += reward; UpdateUI(); SavePetData();
+            Raccooins += reward; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_sushi_played: 1, inc_sushi_rc: reward, inc_rc_earned: reward }); LogAction({ action_type: 'MinigamePlay', action_detail: 'SushiTap', result: 'SushiTap', rc_earned: reward });
         }
     }, 1000);
 }
@@ -835,7 +981,7 @@ function tapSushi() {
 
 // ---- 4. WORD SCRAMBLE ----
 
-const wordsPool = ["LUNA","RACCOON","BOBA","RAMEN","SUSHI","DUMPLING","WATER","LOFI","HOME","MOCHI","HAPPY","SLEEP","COFFEE","MATCHA","COOKIE","PILLOW","NEON","SUNSET","CHILL","MELODY","DREAMY","CUDDLE","SAKURA","TATAMI","LANTERN","BONSAI","TAYAKI","PUDDING","PASTRY","TEAPOT","STARRY","TWILIGHT","BLANKET","CANDLE","BREEZE","MIDNIGHT","SNUGGLE","NIBBLE","PAWS","FLUFFY","BANDIT","WASABI","NOODLES","COCOA","CARAMEL","WAFFLE","DAWN","GLOW","COMFY"];
+const wordsPool = ["LUNA", "RACCOON", "BOBA", "RAMEN", "SUSHI", "DUMPLING", "WATER", "LOFI", "HOME", "MOCHI", "HAPPY", "SLEEP", "COFFEE", "MATCHA", "COOKIE", "PILLOW", "NEON", "SUNSET", "CHILL", "MELODY", "DREAMY", "CUDDLE", "SAKURA", "TATAMI", "LANTERN", "BONSAI", "TAYAKI", "PUDDING", "PASTRY", "TEAPOT", "STARRY", "TWILIGHT", "BLANKET", "CANDLE", "BREEZE", "MIDNIGHT", "SNUGGLE", "NIBBLE", "PAWS", "FLUFFY", "BANDIT", "WASABI", "NOODLES", "COCOA", "CARAMEL", "WAFFLE", "DAWN", "GLOW", "COMFY"];
 let currentWord = "";
 
 function nextScramble() {
@@ -851,7 +997,7 @@ function checkScrambleGuess() {
     let guess = document.getElementById('scramble-input').value.toUpperCase().trim();
     if (guess === currentWord) {
         document.getElementById('scramble-status').innerText = "🎉 Correct! +60RC";
-        Raccooins += 60; UpdateUI(); SavePetData();
+        Raccooins += 60; UpdateUI(); SavePetData({ action_type: 'MinigamePlay', inc_scramble_played: 1, inc_scramble_won: 1, inc_rc_earned: 60 }); LogAction({ action_type: 'MinigamePlay', action_detail: 'WordScramble', result: 'WordScrambleWin', rc_earned: 60 });
         startCooldown("scramble-submit-btn", MINIGAME_COOLDOWN_MS, "Submit");
         setTimeout(nextScramble, 1200);
     } else {
@@ -891,10 +1037,10 @@ function startCatcherGame() {
     catcherTimer = 20;
     if (catcherStartBtn) catcherStartBtn.style.display = 'none';
     if (catcherStatus) catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
-    
+
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-    
+
     catcherInterval = setInterval(spawnCatcherItem, 500);
     catcherCountdown = setInterval(() => {
         catcherTimer--;
@@ -908,11 +1054,11 @@ function spawnCatcherItem() {
 
     const item = document.createElement('div');
     item.classList.add('falling-cookie');
-    item.innerText = '🍪'; 
-    
+    item.innerText = '🍪';
+
     const rect = catcherZone.getBoundingClientRect();
     const randomX = Math.floor(Math.random() * (rect.width - 25));
-    
+
     item.style.left = randomX + 'px';
     item.style.top = '0px';
     catcherZone.appendChild(item);
@@ -925,7 +1071,7 @@ function spawnCatcherItem() {
             return;
         }
 
-        itemTop += 5; 
+        itemTop += 5;
         item.style.top = itemTop + 'px';
 
         const basketLeft = parseFloat(catcherBasket.style.left) || 0;
@@ -953,24 +1099,26 @@ function endCatcherGame() {
     isCatcherActive = false;
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-    
+
     document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
-    
-    const prizeRC = Math.floor(catcherScore * 5); 
-    const prizeRP = Math.floor(catcherScore * 2); 
-    
+
+    const prizeRC = Math.floor(catcherScore * 5);
+    const prizeRP = Math.floor(catcherScore * 2);
+
     Raccooins += prizeRC;
     RelationshipPoints += prizeRP;
-    
+
     if (catcherStatus) {
         catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
     }
     if (catcherStartBtn) {
         catcherStartBtn.style.display = 'inline-block';
+        startCooldown("catcher-start-btn", MINIGAME_COOLDOWN_MS, "Start Game");
     }
-    
+
     UpdateUI();
-    SavePetData();
+    SavePetData({ action_type: 'MinigamePlay', inc_catcher_played: 1, inc_catcher_rc: prizeRC, inc_catcher_rp: prizeRP, inc_rc_earned: prizeRC, inc_rp_minigames: prizeRP });
+    LogAction({ action_type: 'MinigamePlay', action_detail: 'CookieCatcher', result: 'CookieCatcher', rc_earned: prizeRC, rp_gained: prizeRP });
 }
 
 // ---- 6. FORTUNE COOKIE ----
@@ -1014,7 +1162,8 @@ function clickFortuneCookie() {
             Raccooins += prizeRC;
             RelationshipPoints += prizeRP;
             UpdateUI();
-            SavePetData();
+            SavePetData({ action_type: 'MinigamePlay', inc_fortune_played: 1, inc_fortune_rc: prizeRC, inc_fortune_rp: prizeRP, inc_rc_earned: prizeRC, inc_rp_minigames: prizeRP });
+            LogAction({ action_type: 'MinigamePlay', action_detail: 'FortuneCookie', result: 'FortuneCookie', rc_earned: prizeRC, rp_gained: prizeRP });
             if (resetBtn) resetBtn.style.display = 'inline-block';
         }, 400);
     }

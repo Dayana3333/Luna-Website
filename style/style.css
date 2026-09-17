@@ -4,7 +4,7 @@
   font-family: 'Fredoka';
   font-style: normal;
   font-weight: 400;
-  src: url('./fonts/fredoka-v17-latin-regular.woff2') format('woff2'); 
+  src: url('../fonts/fredoka-v17-latin-regular.woff2') format('woff2'); 
 }
 
 
@@ -14,7 +14,7 @@
   font-family: 'Comfortaa';
   font-style: normal;
   font-weight: 400;
-  src: url('./fonts/comfortaa-v47-latin-regular.woff2') format('woff2'); 
+  src: url('../fonts/comfortaa-v47-latin-regular.woff2') format('woff2'); 
 }
 
 :root {
@@ -212,62 +212,6 @@ body {
   color: var(--text-accent);
   letter-spacing: 1px;
   
-}
-
-/* --- KERESÉSI ÉS RENDEZÉSI BAR --- */
-.ShopSearchBar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.ShopSearchInput {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #fff;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.ShopSearchInput::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.ShopSearchInput:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.ShopSortDropdown {
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  color: #fff;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s;
-  min-width: 80px;
-}
-
-.ShopSortDropdown:hover {
-  background: linear-gradient(135deg, #9a6040, #7c4f2d);
-}
-
-.ShopSortDropdown:focus {
-  border-color: #c4a8f5;
-}
-
-.ShopSortDropdown option {
-  background: #1a0c06;
-  color: #fff;
 }
 
 /* --- KÖZÉPSŐ TERMÉK DOBOZ --- */
@@ -796,55 +740,39 @@ body {
 /* --- MOBIL ÉS DISCORD ACTIVITY RESPONSIVE NÉZET (max-width: 900px) --- */
 @media screen and (max-width: 900px) {
     
-    /* A Discord belső ablakának kényszerítése a normális görgetésre */
     html, body {
         width: 100% !important;
-        height: 100% !important;
-        min-height: 100vh !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important; 
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
-        padding-top: 75px !important;
+        padding: 0 !important;
         margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
     body, button, .mobile-toggle-btn, .panel-close-btn, .Button, .BuyButton {
         touch-action: manipulation !important; 
     }
 
-    .minigame-container, .Shop {
-        display: none !important; 
-        position: fixed !important;
-        top: 110px !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: calc(100vh - 60px) !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        border: none !important;
-        z-index: 999 !important; 
-        background: var(--panel-bg) !important;
-        overflow-y: auto !important; 
-        padding: 20px !important;
-    }
-
-    /* FELSŐ FIX MOBIL MENÜSÁV */
+    /* 2. FELSŐ FIX MOBIL MENÜSÁV  */
     .mobile-nav-bar {
         display: flex !important;
-        position: fixed !important;
-        top: 50px !important;
+        position: relative !important; 
+        top: 55px !important;
         left: 0 !important;
         width: 100% !important;
-        height: 60px !important;
+        height: 55px !important;
         background: #1a0c06 !important; 
         border-bottom: 2px solid var(--panel-border) !important;
-        z-index: 1000 !important; 
-        padding: 8px !important;
+        z-index: 0 !important; 
+        padding: 8px 12px !important;
         gap: 10px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+        box-sizing: border-box !important;
+        flex-shrink: 0 !important;
     }
 
     .mobile-toggle-btn {
@@ -855,31 +783,33 @@ body {
         border-radius: 8px !important;
         font-family: 'Fredoka', sans-serif !important;
         font-weight: bold !important;
-        font-size: 15px !important;
+        font-size: 14px !important;
         cursor: pointer !important;
     }
 
-    /* KÖZÉPSŐ JÁTÉKTÉR */
+    /* 3. KÖZÉPSŐ JÁTÉKTÉR (Kényelmesen elfér görgetés nélkül) */
     .PetArea {
         width: 100% !important;
         max-width: 400px !important;
-        margin: 0 auto !important;
+        margin: 10px auto 0 auto !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         text-align: center !important;
-        padding: 10px !important;
+        padding: 5px 10px !important;
         box-sizing: border-box !important;
+        flex-grow: 1 !important;
+        justify-content: center !important;
     }
 
     #PetName {
-        font-size: 36px !important;
-        margin-bottom: 10px !important;
+        font-size: 32px !important;
+        margin-bottom: 8px !important;
     }
 
     #Raccoon {
         width: 100% !important;
-        max-width: 250px !important; 
+        max-width: 220px !important; /* Kicsit optimalizálva, hogy sehol se lógjon ki */
         height: auto !important;
     }
 
@@ -887,20 +817,38 @@ body {
         display: flex !important;
         flex-direction: row !important;
         justify-content: center !important;
-        gap: 10px !important;
+        gap: 8px !important;
         width: 100% !important;
-        margin-top: 15px !important;
+        margin-top: 10px !important;
     }
 
     .Button {
         flex: 1 !important;
-        font-size: 14px !important;
-        padding: 12px 8px !important;
-        max-width: 110px !important;
+        font-size: 13px !important;
+        padding: 10px 6px !important;
+        max-width: 105px !important;
         white-space: nowrap !important;
     }
 
-    /* Telefonos megnyitás esetén */
+    /* 4. FELUGRÓ PANELEK (Bolt / Játékok) - Itt engedélyezett a görgetés, ha sok a tartalom */
+    .minigame-container, .Shop {
+        display: none !important; 
+        position: fixed !important;
+        top: 55px !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: calc(100vh - 55px) !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        z-index: 999 !important; 
+        background: var(--panel-bg) !important;
+        overflow-y: auto !important; 
+        -webkit-overflow-scrolling: touch !important;
+        padding: 15px 15px 40px 15px !important;
+        box-sizing: border-box !important;
+    }
+
     .minigame-container.mobile-open, .Shop.mobile-open {
         display: flex !important; 
         flex-direction: column !important;
@@ -908,16 +856,16 @@ body {
 
     .panel-close-btn {
         display: flex !important;
-        position: absolute !important;
-        top: 15px !important;
+        position: fixed !important;
+        top: 65px !important;
         right: 15px !important;
         background: #5c1d10 !important;
         border: 1px solid #9c3a27 !important;
         color: #fff !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 34px !important;
+        height: 34px !important;
         border-radius: 50% !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: bold !important;
         align-items: center !important;
         justify-content: center !important;
@@ -925,9 +873,8 @@ body {
         cursor: pointer !important;
     }
 
-    /* Belső elemek igazítása a felugró ablakban */
     .minigame-header, .CoinContainer {
-        margin-top: 40px !important; 
+        margin-top: 10px !important; 
     }
 
     .ItemsContainer {
@@ -942,18 +889,19 @@ body {
         display: flex !important;
         flex-direction: row !important; 
         align-items: center !important;
+        box-sizing: border-box !important;
     }
 
-    /* Rádió elhelyezése */
+    /* 5. RÁDIÓ ELHELYEZÉSE ALUL BALRA */
     .radio-container {
         position: fixed !important;
-        bottom: 15px !important;
-        left: 15px !important;
+        bottom: 10px !important;
+        left: 10px !important;
         z-index: 50 !important;
     }
     
     #lofi-radio {
-        width: 45px !important;
+        width: 40px !important;
         height: auto !important;
     }
 }
