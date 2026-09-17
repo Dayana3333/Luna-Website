@@ -81,21 +81,21 @@ try {
 
 async function setupDiscordActivity() {
     const startPolling = () => {
-    setInterval(async () => {
-        if (!currentSaveKey || isSaving) return;
-        const { data, error } = await supabaseClient
-            .from('pet_data')
-            .select('*')
-            .eq('guild_id', currentSaveKey)
-            .single();
-        if (error || !data) return;
-        Raccooins = data.raccooin ?? 100;
-        RelationshipPoints = data.relationship_points || 0;
-        const petNameEl = document.querySelector('#PetName');
-        if (petNameEl) petNameEl.innerText = data.name;
-        UpdateUI();
-    }, 5000);
-};
+        setInterval(async () => {
+            if (!currentSaveKey || isSaving) return;
+            const { data, error } = await supabaseClient
+                .from('pet_data')
+                .select('*')
+                .eq('guild_id', currentSaveKey)
+                .single();
+            if (error || !data) return;
+            Raccooins = data.raccooin ?? 100;
+            RelationshipPoints = data.relationship_points || 0;
+            const petNameEl = document.querySelector('#PetName');
+            if (petNameEl) petNameEl.innerText = data.name;
+            UpdateUI();
+        }, 5000);
+    };
 
     if (!discordSdk) {
         console.log("Local mode — no Discord SDK.");
@@ -152,12 +152,12 @@ async function updateDiscordPresence() {
     try {
         await discordSdk.commands.setActivity({
             activity: {
-                type: 0, 
+                type: 0,
                 details: "Chilling with Luna 🦝",
                 state: "Virtual Pet Activity",
                 assets: {
-                    large_image: "embedded_cover", 
-                    large_text: "Luna" 
+                    large_image: "embedded_cover",
+                    large_text: "Luna"
                 }
             }
         });
@@ -246,43 +246,43 @@ async function SavePetData(ctx = {}) {
                 relationship_level_num: currentLevel.level,
                 relationship_level_name: currentLevel.name,
                 name: document.querySelector('#PetName')?.innerText || 'Luna',
-                last_interaction_type:    ctx.action_type    || null,
-                last_interaction_by_id:   currentUser.id,
+                last_interaction_type: ctx.action_type || null,
+                last_interaction_by_id: currentUser.id,
                 last_interaction_by_name: currentUser.username,
-                caused_level_up:          ctx.caused_level_up || false,
-                last_level_up_by_id:      ctx.caused_level_up ? currentUser.id        : undefined,
-                last_level_up_by_name:    ctx.caused_level_up ? currentUser.username  : undefined,
-                inc_feed:           ctx.inc_feed          || 0,
-                inc_water:          ctx.inc_water         || 0,
-                inc_pet:            ctx.inc_pet           || 0,
-                inc_items:          ctx.inc_items         || 0,
-                inc_bubble_tea:     ctx.inc_bubble_tea    || 0,
-                inc_steamed_buns:   ctx.inc_steamed_buns  || 0,
-                inc_ramen:          ctx.inc_ramen         || 0,
+                caused_level_up: ctx.caused_level_up || false,
+                last_level_up_by_id: ctx.caused_level_up ? currentUser.id : undefined,
+                last_level_up_by_name: ctx.caused_level_up ? currentUser.username : undefined,
+                inc_feed: ctx.inc_feed || 0,
+                inc_water: ctx.inc_water || 0,
+                inc_pet: ctx.inc_pet || 0,
+                inc_items: ctx.inc_items || 0,
+                inc_bubble_tea: ctx.inc_bubble_tea || 0,
+                inc_steamed_buns: ctx.inc_steamed_buns || 0,
+                inc_ramen: ctx.inc_ramen || 0,
                 inc_tictactoe_played: ctx.inc_tictactoe_played || 0,
-                inc_tictactoe_won:  ctx.inc_tictactoe_won  || 0,
+                inc_tictactoe_won: ctx.inc_tictactoe_won || 0,
                 inc_tictactoe_lost: ctx.inc_tictactoe_lost || 0,
-                inc_memory_played:  ctx.inc_memory_played  || 0,
-                inc_memory_won:     ctx.inc_memory_won     || 0,
-                inc_memory_lost:    ctx.inc_memory_lost    || 0,
-                inc_sushi_played:   ctx.inc_sushi_played   || 0,
-                inc_sushi_rc:       ctx.inc_sushi_rc       || 0,
-                inc_scramble_played:ctx.inc_scramble_played || 0,
-                inc_scramble_won:   ctx.inc_scramble_won   || 0,
-                inc_scramble_lost:  ctx.inc_scramble_lost  || 0,
+                inc_memory_played: ctx.inc_memory_played || 0,
+                inc_memory_won: ctx.inc_memory_won || 0,
+                inc_memory_lost: ctx.inc_memory_lost || 0,
+                inc_sushi_played: ctx.inc_sushi_played || 0,
+                inc_sushi_rc: ctx.inc_sushi_rc || 0,
+                inc_scramble_played: ctx.inc_scramble_played || 0,
+                inc_scramble_won: ctx.inc_scramble_won || 0,
+                inc_scramble_lost: ctx.inc_scramble_lost || 0,
                 inc_catcher_played: ctx.inc_catcher_played || 0,
-                inc_catcher_rc:     ctx.inc_catcher_rc     || 0,
-                inc_catcher_rp:     ctx.inc_catcher_rp     || 0,
+                inc_catcher_rc: ctx.inc_catcher_rc || 0,
+                inc_catcher_rp: ctx.inc_catcher_rp || 0,
                 inc_fortune_played: ctx.inc_fortune_played || 0,
-                inc_fortune_rc:     ctx.inc_fortune_rc     || 0,
-                inc_fortune_rp:     ctx.inc_fortune_rp     || 0,
-                inc_rp_feed:        ctx.inc_rp_feed        || 0,
-                inc_rp_water:       ctx.inc_rp_water       || 0,
-                inc_rp_pet:         ctx.inc_rp_pet         || 0,
-                inc_rp_items:       ctx.inc_rp_items       || 0,
-                inc_rp_minigames:   ctx.inc_rp_minigames   || 0,
-                inc_rc_spent:       ctx.inc_rc_spent       || 0,
-                inc_rc_earned:      ctx.inc_rc_earned      || 0,
+                inc_fortune_rc: ctx.inc_fortune_rc || 0,
+                inc_fortune_rp: ctx.inc_fortune_rp || 0,
+                inc_rp_feed: ctx.inc_rp_feed || 0,
+                inc_rp_water: ctx.inc_rp_water || 0,
+                inc_rp_pet: ctx.inc_rp_pet || 0,
+                inc_rp_items: ctx.inc_rp_items || 0,
+                inc_rp_minigames: ctx.inc_rp_minigames || 0,
+                inc_rc_spent: ctx.inc_rc_spent || 0,
+                inc_rc_earned: ctx.inc_rc_earned || 0,
                 current_rc: Raccooins,
                 current_rp: RelationshipPoints,
             }),
@@ -310,7 +310,7 @@ async function LogAction({
     if (!currentSaveKey) return;
     try {
         const levelBefore = relationship_level_before ?? GetCurrentLevel(RelationshipPoints - rp_gained)?.level ?? null;
-        const levelAfter  = relationship_level_after  ?? GetCurrentLevel(RelationshipPoints)?.level ?? null;
+        const levelAfter = relationship_level_after ?? GetCurrentLevel(RelationshipPoints)?.level ?? null;
         await fetch(ACTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -340,14 +340,14 @@ async function LogAction({
 // ==========================================
 
 const RelationshipLevels = [
-    { level: 1, name: "Strangers",     threshold: 0 },
+    { level: 1, name: "Strangers", threshold: 0 },
     { level: 2, name: "Acquaintances", threshold: 1000 },
-    { level: 3, name: "Friends",       threshold: 5000 },
-    { level: 4, name: "Good Friends",  threshold: 15000 },
+    { level: 3, name: "Friends", threshold: 5000 },
+    { level: 4, name: "Good Friends", threshold: 15000 },
     { level: 5, name: "Close Friends", threshold: 40000 },
-    { level: 6, name: "Besto Frendo",  threshold: 100000 },
-    { level: 7, name: "Inseparable",   threshold: 250000 },
-    { level: 8, name: "Soulmates",     threshold: 600000 }
+    { level: 6, name: "Besto Frendo", threshold: 100000 },
+    { level: 7, name: "Inseparable", threshold: 250000 },
+    { level: 8, name: "Soulmates", threshold: 600000 }
 ];
 
 function GetCurrentLevel(points) {
@@ -575,19 +575,19 @@ function Activity(ActionType) {
     }
 
     const levelBefore = GetCurrentLevel(RelationshipPoints - (ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1));
-    const levelAfter  = GetCurrentLevel(RelationshipPoints);
+    const levelAfter = GetCurrentLevel(RelationshipPoints);
     const causedLevelUp = levelAfter.level > levelBefore.level;
     const rpGained = ActionType === 'Feed' ? 250 : ActionType === 'Water' ? 150 : 1;
 
     const ctx = {
         action_type: ActionType,
         caused_level_up: causedLevelUp,
-        inc_feed:    ActionType === 'Feed'  ? 1 : 0,
-        inc_water:   ActionType === 'Water' ? 1 : 0,
-        inc_pet:     ActionType === 'Pet'   ? 1 : 0,
-        inc_rp_feed:  ActionType === 'Feed'  ? rpGained : 0,
+        inc_feed: ActionType === 'Feed' ? 1 : 0,
+        inc_water: ActionType === 'Water' ? 1 : 0,
+        inc_pet: ActionType === 'Pet' ? 1 : 0,
+        inc_rp_feed: ActionType === 'Feed' ? rpGained : 0,
         inc_rp_water: ActionType === 'Water' ? rpGained : 0,
-        inc_rp_pet:   ActionType === 'Pet'   ? rpGained : 0,
+        inc_rp_pet: ActionType === 'Pet' ? rpGained : 0,
     };
 
     SavePetData(ctx);
@@ -608,14 +608,14 @@ function Activity(ActionType) {
 
 function toggleRadio() {
     const radioStatus = document.getElementById('radio-status');
-    
+
     if (!radioStatus) return;
 
     if (radioAudio.paused) {
         radioAudio.play()
             .then(() => {
                 radioStatus.textContent = "ON";
-                radioStatus.style.color = "#55ff55"; 
+                radioStatus.style.color = "#55ff55";
             })
             .catch(error => {
                 console.error("Discord Audio lejátszási hiba:", error);
@@ -623,7 +623,7 @@ function toggleRadio() {
     } else {
         radioAudio.pause();
         radioStatus.textContent = "OFF";
-        radioStatus.style.color = "#ff5555"; 
+        radioStatus.style.color = "#ff5555";
     }
 }
 
@@ -642,7 +642,7 @@ function BuyItem(ItemName, ItemPrice) {
     RelationshipPoints += RelationshipPointReward;
 
     const levelBefore = GetCurrentLevel(RelationshipPoints - RelationshipPointReward);
-    const levelAfter  = GetCurrentLevel(RelationshipPoints);
+    const levelAfter = GetCurrentLevel(RelationshipPoints);
     const causedLevelUp = levelAfter.level > levelBefore.level;
 
     const itemKey = ItemName === 'BubbleTea' ? 'inc_bubble_tea' : ItemName === 'SteamedBuns' ? 'inc_steamed_buns' : 'inc_ramen';
@@ -691,10 +691,10 @@ function UpdateUI() {
 
     if (coinEl) coinEl.innerText = Raccooins.toLocaleString() + 'RC';
     if (relEl) relEl.innerText = RelationshipPoints.toLocaleString() + 'RP';
-    
+
     const CurrentLevel = GetCurrentLevel(RelationshipPoints);
     if (lvlEl) lvlEl.innerText = CurrentLevel.name;
-    
+
     checkMinigameUnlock(RelationshipPoints);
 }
 
@@ -774,7 +774,7 @@ function playerMove(idx) {
 }
 
 function checkTTTWin(s) {
-    const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    const w = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
     return w.some(c => c.every(i => tttBoard[i] === s));
 }
 
@@ -787,7 +787,7 @@ function resetTTT() {
 
 // ---- 2. MEMORY MATCH ----
 
-let memoryItems = ['🧋','🧋','🥟','🥟','🍜','🍜','🍣','🍣','🍤','🍤','🍡','🍡','🥞','🥞','🍊','🍊'];
+let memoryItems = ['🧋', '🧋', '🥟', '🥟', '🍜', '🍜', '🍣', '🍣', '🍤', '🍤', '🍡', '🍡', '🥞', '🥞', '🍊', '🍊'];
 let flippedCards = [];
 let matchedCount = 0;
 
@@ -842,7 +842,7 @@ function restartMemoryGame() {
 let sushiTimer;
 let sushiScore = 0;
 let sushiTimeLeft = 15;
-const goodFoods = ['🍣','🥟','🍜','🧋','🍡','🍤'];
+const goodFoods = ['🍣', '🥟', '🍜', '🧋', '🍡', '🍤'];
 
 function startSushiGame() {
     clearInterval(sushiTimer);
@@ -878,7 +878,7 @@ function tapSushi() {
 
 // ---- 4. WORD SCRAMBLE ----
 
-const wordsPool = ["LUNA","RACCOON","BOBA","RAMEN","SUSHI","DUMPLING","WATER","LOFI","HOME","MOCHI","HAPPY","SLEEP","COFFEE","MATCHA","COOKIE","PILLOW","NEON","SUNSET","CHILL","MELODY","DREAMY","CUDDLE","SAKURA","TATAMI","LANTERN","BONSAI","TAYAKI","PUDDING","PASTRY","TEAPOT","STARRY","TWILIGHT","BLANKET","CANDLE","BREEZE","MIDNIGHT","SNUGGLE","NIBBLE","PAWS","FLUFFY","BANDIT","WASABI","NOODLES","COCOA","CARAMEL","WAFFLE","DAWN","GLOW","COMFY"];
+const wordsPool = ["LUNA", "RACCOON", "BOBA", "RAMEN", "SUSHI", "DUMPLING", "WATER", "LOFI", "HOME", "MOCHI", "HAPPY", "SLEEP", "COFFEE", "MATCHA", "COOKIE", "PILLOW", "NEON", "SUNSET", "CHILL", "MELODY", "DREAMY", "CUDDLE", "SAKURA", "TATAMI", "LANTERN", "BONSAI", "TAYAKI", "PUDDING", "PASTRY", "TEAPOT", "STARRY", "TWILIGHT", "BLANKET", "CANDLE", "BREEZE", "MIDNIGHT", "SNUGGLE", "NIBBLE", "PAWS", "FLUFFY", "BANDIT", "WASABI", "NOODLES", "COCOA", "CARAMEL", "WAFFLE", "DAWN", "GLOW", "COMFY"];
 let currentWord = "";
 
 function nextScramble() {
@@ -934,10 +934,10 @@ function startCatcherGame() {
     catcherTimer = 20;
     if (catcherStartBtn) catcherStartBtn.style.display = 'none';
     if (catcherStatus) catcherStatus.innerText = `Score: 0 | Time: ${catcherTimer}s`;
-    
+
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-    
+
     catcherInterval = setInterval(spawnCatcherItem, 500);
     catcherCountdown = setInterval(() => {
         catcherTimer--;
@@ -951,11 +951,11 @@ function spawnCatcherItem() {
 
     const item = document.createElement('div');
     item.classList.add('falling-cookie');
-    item.innerText = '🍪'; 
-    
+    item.innerText = '🍪';
+
     const rect = catcherZone.getBoundingClientRect();
     const randomX = Math.floor(Math.random() * (rect.width - 25));
-    
+
     item.style.left = randomX + 'px';
     item.style.top = '0px';
     catcherZone.appendChild(item);
@@ -968,7 +968,7 @@ function spawnCatcherItem() {
             return;
         }
 
-        itemTop += 5; 
+        itemTop += 5;
         item.style.top = itemTop + 'px';
 
         const basketLeft = parseFloat(catcherBasket.style.left) || 0;
@@ -996,15 +996,15 @@ function endCatcherGame() {
     isCatcherActive = false;
     clearInterval(catcherInterval);
     clearInterval(catcherCountdown);
-    
+
     document.querySelectorAll('.falling-cookie').forEach(el => el.remove());
-    
-    const prizeRC = Math.floor(catcherScore * 5); 
-    const prizeRP = Math.floor(catcherScore * 2); 
-    
+
+    const prizeRC = Math.floor(catcherScore * 5);
+    const prizeRP = Math.floor(catcherScore * 2);
+
     Raccooins += prizeRC;
     RelationshipPoints += prizeRP;
-    
+
     if (catcherStatus) {
         catcherStatus.innerText = `Game Over! Score: ${catcherScore} (+${prizeRC}RC, +${prizeRP}RP)`;
     }
@@ -1012,7 +1012,7 @@ function endCatcherGame() {
         catcherStartBtn.style.display = 'inline-block';
         startCooldown("catcher-start-btn", MINIGAME_COOLDOWN_MS, "Start Game");
     }
-    
+
     UpdateUI();
     SavePetData({ action_type: 'MinigamePlay', inc_catcher_played: 1, inc_catcher_rc: prizeRC, inc_catcher_rp: prizeRP, inc_rc_earned: prizeRC, inc_rp_minigames: prizeRP });
     LogAction({ action_type: 'MinigamePlay', action_detail: 'CookieCatcher', result: 'CookieCatcher', rc_earned: prizeRC, rp_gained: prizeRP });
