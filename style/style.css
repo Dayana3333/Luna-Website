@@ -770,7 +770,7 @@ body {
         background: #1a0c06 !important; 
         border-bottom: 2px solid var(--panel-border) !important;
         z-index: 1000 !important; 
-        padding: 8px 12px !important;
+        padding: 15px 12px !important;
         gap: 10px !important;
         box-sizing: border-box !important;
         flex-shrink: 0 !important;
