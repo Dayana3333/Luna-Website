@@ -768,7 +768,7 @@ body {
         height: 55px !important;
         background: #1a0c06 !important; 
         border-bottom: 2px solid var(--panel-border) !important;
-        z-index: 1000 !important; 
+        z-index: 0 !important; 
         padding: 8px 12px !important;
         gap: 10px !important;
         box-sizing: border-box !important;

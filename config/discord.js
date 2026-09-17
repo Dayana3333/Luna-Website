@@ -1,6 +1,6 @@
 (async () => {
     try {
-        const module = await import("../vendor/discord-sdk.js?v=62");
+        const module = await import("../vendor/discord-sdk.js?v=65");
         window.DiscordSDK = module.DiscordSDK;
         console.log("Discord SDK loaded");
     } catch (error) {
