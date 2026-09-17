@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=67";
+import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=68";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -77,10 +77,17 @@ try {
 
 // Shop items data structure for search and sorting
 const ShopItemsData = [
-    { id: 'bubble_tea', name: 'Bubble Tea', price: 50, image: 'imgs/bubble-tea.png' },
-    { id: 'pork_buns', name: 'Steamed Buns', price: 80, image: 'imgs/buns.png' },
-    { id: 'ramen', name: 'Ramen', price: 100, image: 'imgs/ramen.png' }
-];
+    { id: 'bubble_tea', name: 'Bubble Tea', price: 70, image: 'imgs/bubble-tea.png' },
+    {id: 'matcha_tea', name: 'Matcha Tea', price: 50, image: 'imgs/matcha_tea.png'},
+    { id: 'pork_buns', name: 'Steamed Buns', price: 130, image: 'imgs/buns.png' },
+    { id: 'ramen', name: 'Ramen', price: 150, image: 'imgs/ramen.png' },
+    {id: 'dorayaki', name: 'Dorayaki', price: 75, image: 'imgs/dorayaki.png'},
+    {id: 'mochi', name: 'Mochi', price: 60, image: 'imgs/mochi.png'},
+    {id: 'sashimi', name: 'Sashimi', price: 80, image: 'imgs/sashimi.png'},
+    {id: 'sushi', name: 'Sushi', price: 80, image: 'imgs/sushi.png'},
+    {id: 'onigiri', name: 'Onigiri', price: 75, image: 'imgs/onigiri.png'},
+    {id: 'dango', name: 'Dango', price: 65, image: 'imgs/dango.png'},
+]; 
 
 let filteredShopItems = [...ShopItemsData];
 let currentShopSort = 'none';
@@ -655,7 +662,19 @@ function BuyItem(ItemName, ItemPrice) {
     const levelAfter = GetCurrentLevel(RelationshipPoints);
     const causedLevelUp = levelAfter.level > levelBefore.level;
 
-    const itemKey = ItemName === 'BubbleTea' ? 'inc_bubble_tea' : ItemName === 'SteamedBuns' ? 'inc_steamed_buns' : 'inc_ramen';
+    const itemKey = {
+    'BubbleTea': 'inc_bubble_tea',
+    'SteamedBuns': 'inc_steamed_buns',
+    'Ramen': 'inc_ramen',
+    'Dorayaki': 'inc_dorayaki',
+    'MatchaTea': 'inc_matcha_tea',
+    'Sashimi': 'inc_sashimi',
+    'Sushi': 'inc_sushi',
+    'Dango': 'inc_dango',
+    'Mochi':'inc_mochi',
+    'Onigiri':'inc_onigiri'
+    };
+
     const ctx = {
         action_type: 'BuyItem',
         caused_level_up: causedLevelUp,
@@ -1219,16 +1238,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     });
     
-    // Pet név mentése blur esetén (csak ha üres, akkor restore database value)
     petNameEl?.addEventListener('blur', () => {
         if (petNameTimeout) clearTimeout(petNameTimeout);
         
         const NewName = petNameEl.textContent.trim();
-        // If name is empty, restore from database or use default
         if (!NewName) {
             petNameEl.textContent = PetData?.name || 'Luna';
         } else if (currentSaveKey) {
-            // Otherwise save the name they typed
             SavePetData();
         }
     });
