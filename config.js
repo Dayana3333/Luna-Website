@@ -79,7 +79,7 @@ async function setupDiscordActivity() {
     setInterval(async () => {
         if (!currentSaveKey || isSaving) return;
         const { data, error } = await supabaseClient
-            .from('luna_data')
+            .from('pet_data')
             .select('*')
             .eq('guild_id', currentSaveKey)
             .single();
@@ -160,7 +160,7 @@ async function FetchPetData() {
     if (!currentSaveKey) return;
     try {
         let { data, error } = await supabaseClient
-            .from('luna_data')
+            .from('pet_data')
             .select('*')
             .eq('guild_id', currentSaveKey)
             .single();
@@ -182,7 +182,7 @@ async function FetchPetData() {
             });
 
             const { data: newPet, error: refetchError } = await supabaseClient
-                .from('luna_data')
+                .from('pet_data')
                 .select('*')
                 .eq('guild_id', currentSaveKey)
                 .single();
