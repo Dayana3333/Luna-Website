@@ -519,7 +519,7 @@ function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
     if (Raccoon) {
-        Raccoon.src = 'imgs/raccoon.png?v=65';
+        Raccoon.src = 'imgs/raccoon.png?v=66';
         Raccoon.classList.add('pet-idle');
     }
 }
@@ -538,7 +538,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
     ActivityTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = 'imgs/raccoon.png?v=65';
+            Raccoon.src = 'imgs/raccoon.png?v=66';
             if (CssClass) Raccoon.classList.remove(CssClass);
             Raccoon.classList.add('pet-idle');
         }
