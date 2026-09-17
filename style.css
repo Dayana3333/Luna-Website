@@ -214,6 +214,62 @@ body {
   
 }
 
+/* --- KERESÉSI ÉS RENDEZÉSI BAR --- */
+.ShopSearchBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ShopSearchInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ShopSearchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ShopSearchInput:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ShopSortDropdown {
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+.ShopSortDropdown:hover {
+  background: linear-gradient(135deg, #9a6040, #7c4f2d);
+}
+
+.ShopSortDropdown:focus {
+  border-color: #c4a8f5;
+}
+
+.ShopSortDropdown option {
+  background: #1a0c06;
+  color: #fff;
+}
+
 /* --- KÖZÉPSŐ TERMÉK DOBOZ --- */
 .ItemsContainer {
   flex: 1;

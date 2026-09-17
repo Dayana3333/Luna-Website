@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Your Pet's Home</title>
 
-    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=50">
-    <link rel="stylesheet" href="style.css?v=50">
+    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico?v=44">
+    <link rel="stylesheet" href="style.css?v=44">
 </head>
 
 <body>
@@ -124,6 +124,17 @@
             <div class="CoinTextContainer">10,000RC</div>
         </div>
 
+        <div class="ShopSearchBar">
+            <input type="text" id="shop-search-input" placeholder="Search items..." class="ShopSearchInput">
+            <select id="shop-sort-dropdown" class="ShopSortDropdown">
+                <option value="none">Sort</option>
+                <option value="name-asc">A to Z</option>
+                <option value="name-desc">Z to A</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+            </select>
+        </div>
+
         <div class="ItemsContainer">
             <div class="ItemCard">
                 <div class="ItemPreview">
@@ -170,8 +181,8 @@
         </div>
     </div>
 
-    <script src="vendor/supabase.js?v=50"></script>
-    <script type="module" src="config.js?v=50"></script>
+    <script src="vendor/supabase.js?v=45"></script>
+    <script type="module" src="config.js?v=45"></script>
 
 <script>
 (function(){

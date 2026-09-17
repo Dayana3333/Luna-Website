@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "./vendor/discord-sdk.js?v=50";
+import { DiscordSDK, patchUrlMappings } from "./vendor/discord-sdk.js";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -70,6 +70,16 @@ try {
     console.warn("Discord SDK unavailable, running in web mode.", err);
 }
 
+// Shop items data structure for search and sorting
+const ShopItemsData = [
+    { id: 'bubble_tea', name: 'Bubble Tea', price: 50, image: 'imgs/bubble-tea.png' },
+    { id: 'pork_buns', name: 'Steamed Buns', price: 80, image: 'imgs/buns.png' },
+    { id: 'ramen', name: 'Ramen', price: 100, image: 'imgs/ramen.png' }
+];
+
+let filteredShopItems = [...ShopItemsData];
+let currentShopSort = 'none';
+
 // ==========================================
 // DISCORD ACTIVITY INDÍTÁS ÉS PRESENCE
 // ==========================================
@@ -86,8 +96,15 @@ async function setupDiscordActivity() {
         if (error || !data) return;
         Raccooins = data.raccooin ?? 100;
         RelationshipPoints = data.relationship_points || 0;
+        // IMPORTANT: Don't overwrite pet name while user is editing it
         const petNameEl = document.querySelector('#PetName');
-        if (petNameEl) petNameEl.innerText = data.name;
+        if (petNameEl && petNameEl !== document.activeElement) {
+            // Only update if the field is empty (lost data recovery)
+            const currentName = petNameEl.textContent.trim();
+            if (!currentName) {
+                petNameEl.innerText = data.name;
+            }
+        }
         UpdateUI();
     }, 5000);
 };
@@ -519,6 +536,99 @@ function BuyItem(ItemName, ItemPrice) {
     SavePetData();
 }
 
+// ==========================================
+// SHOP SEARCH & SORT SYSTEM
+// ==========================================
+
+/**
+ * Fuzzy search algorithm for intelligent matching
+ * Examples: "bb" matches "Bubble Tea", "ra" matches "Ramen"
+ */
+function fuzzySearch(query, text) {
+    query = query.toLowerCase();
+    text = text.toLowerCase();
+    
+    if (!query) return true;
+    
+    let queryIndex = 0;
+    let textIndex = 0;
+    
+    while (queryIndex < query.length && textIndex < text.length) {
+        if (query[queryIndex] === text[textIndex]) {
+            queryIndex++;
+        }
+        textIndex++;
+    }
+    
+    return queryIndex === query.length;
+}
+
+function updateShopDisplay() {
+    const container = document.querySelector('.ItemsContainer');
+    if (!container) return;
+    
+    // Clear existing items
+    container.innerHTML = '';
+    
+    if (filteredShopItems.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px; font-size: 14px;">No items found</p>';
+        return;
+    }
+    
+    // Rebuild item cards
+    filteredShopItems.forEach(item => {
+        const itemCard = document.createElement('div');
+        itemCard.className = 'ItemCard';
+        itemCard.innerHTML = `
+            <div class="ItemPreview">
+                <img src="${item.image}" title="${item.name}" alt="${item.name}" class="ItemImage">
+            </div>
+            <div class="ItemDetails">
+                <h3 class="ItemName">${item.name}</h3>
+                <p class="ItemPrice">Price: ${item.price}RC</p>
+                <button class="BuyButton" data-item="${item.id}" data-price="${item.price}">Buy</button>
+            </div>
+        `;
+        container.appendChild(itemCard);
+        
+        // Add event listener to the buy button
+        const buyBtn = itemCard.querySelector('.BuyButton');
+        buyBtn.addEventListener('click', () => {
+            BuyItem(item.id, item.price);
+        });
+    });
+}
+
+function searchShop(query) {
+    filteredShopItems = ShopItemsData.filter(item => 
+        fuzzySearch(query, item.name)
+    );
+    applyShopSort(currentShopSort);
+}
+
+function applyShopSort(sortType) {
+    currentShopSort = sortType;
+    
+    switch(sortType) {
+        case 'name-asc':
+            filteredShopItems.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name-desc':
+            filteredShopItems.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        case 'price-asc':
+            filteredShopItems.sort((a, b) => a.price - b.price);
+            break;
+        case 'price-desc':
+            filteredShopItems.sort((a, b) => b.price - a.price);
+            break;
+        default: // 'none'
+            filteredShopItems.sort((a, b) => ShopItemsData.indexOf(a) - ShopItemsData.indexOf(b));
+    }
+    
+    updateShopDisplay();
+}
+
 function TriggerLunaJoy() {
     const PetContainer = document.querySelector('.pet');
     if (PetContainer) {
@@ -926,10 +1036,50 @@ function resetFortuneCookie() {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Pet név mentése blur esetén (Biztonságos betöltés)
-    document.querySelector('#PetName')?.addEventListener('blur', () => {
-        const NewName = document.querySelector('#PetName').textContent.trim();
-        if (NewName && currentSaveKey) {
+    // ==========================================
+    // PET NAME INPUT VALIDATION & SAVING
+    // ==========================================
+    const petNameEl = document.querySelector('#PetName');
+    let petNameTimeout = null;
+    
+    petNameEl?.addEventListener('input', () => {
+        // Clear previous timeout
+        if (petNameTimeout) clearTimeout(petNameTimeout);
+        
+        // Only allow English letters (a-z, A-Z) and numbers (0-9), max 16 characters
+        let text = petNameEl.textContent;
+        let cleaned = text.replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+        
+        // Only update if text actually changed
+        if (cleaned !== text) {
+            petNameEl.textContent = cleaned;
+            // Move cursor to end
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(petNameEl);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+        
+        // Debounce save: wait 1 second after user stops typing
+        petNameTimeout = setTimeout(() => {
+            if (currentSaveKey && cleaned) {
+                SavePetData();
+            }
+        }, 1000);
+    });
+    
+    // Pet név mentése blur esetén (csak ha üres, akkor restore database value)
+    petNameEl?.addEventListener('blur', () => {
+        if (petNameTimeout) clearTimeout(petNameTimeout);
+        
+        const NewName = petNameEl.textContent.trim();
+        // If name is empty, restore from database or use default
+        if (!NewName) {
+            petNameEl.textContent = PetData?.name || 'Luna';
+        } else if (currentSaveKey) {
+            // Otherwise save the name they typed
             SavePetData();
         }
     });
@@ -1001,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 10. Bolt vásárlás gombok
+    // 10. Bolt vásárlás gombok (initial static buttons)
     document.querySelectorAll('.BuyButton[data-item]').forEach(button => {
         button.addEventListener('click', () => {
             const item = button.getAttribute('data-item');
@@ -1010,6 +1160,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 BuyItem(item, price);
             }
         });
+    });
+
+    // ==========================================
+    // 11. BOLT KERESÉSI ÉS RENDEZÉSI SYSTEM
+    // ==========================================
+    const shopSearchInput = document.getElementById('shop-search-input');
+    const shopSortDropdown = document.getElementById('shop-sort-dropdown');
+    
+    shopSearchInput?.addEventListener('input', (e) => {
+        const query = e.target.value;
+        searchShop(query);
+    });
+    
+    shopSortDropdown?.addEventListener('change', (e) => {
+        const sortType = e.target.value;
+        applyShopSort(sortType);
     });
 
     // ==========================================
@@ -1063,6 +1229,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mobil gombok inicializálása
         initMobilePanels();
+        
+        // Shop inicializálása
+        updateShopDisplay();
     } catch (error) {
         console.error("Hiba az inicializálás során:", error);
     }
