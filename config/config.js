@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=55";
+import { DiscordSDK, patchUrlMappings } from "vendor/discord-sdk.js?v=55";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -433,13 +433,13 @@ const gameTitles = ["Tic-Tac-Toe", "Luna Memory Match", "Sushi Tap", "Word Scram
 // ==========================================
 
 const DayBackgrounds = [
-    "url('../imgs/daylight_wp_1.jpg')",
-    "url('../imgs/daylight_wp_2.png')"
+    "url('imgs/daylight_wp_1.jpg')",
+    "url('imgs/daylight_wp_2.png')"
 ];
 
 const NightBackgrounds = [
-    "url('../imgs/night_wp_1.jpg')",
-    "url('../imgs/night_wp_2.jpg')"
+    "url('imgs/night_wp_1.jpg')",
+    "url('imgs/night_wp_2.jpg')"
 ];
 
 function SetBackground() {
@@ -499,7 +499,7 @@ function ResetSleepTimer() {
 
     SleepTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = '../imgs/sleep_raccoon.png';
+            Raccoon.src = 'imgs/sleep_raccoon.png';
             Raccoon.classList.remove('pet-idle');
         }
     }, SleepDelay);
@@ -509,7 +509,7 @@ function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
     if (Raccoon) {
-        Raccoon.src = '../imgs/raccoon.png?v=55';
+        Raccoon.src = 'imgs/raccoon.png?v=55';
         Raccoon.classList.add('pet-idle');
     }
 }
@@ -528,7 +528,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
     ActivityTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = '../imgs/raccoon.png?v=55';
+            Raccoon.src = 'imgs/raccoon.png?v=55';
             if (CssClass) Raccoon.classList.remove(CssClass);
             Raccoon.classList.add('pet-idle');
         }
@@ -555,13 +555,13 @@ function Activity(ActionType) {
     UpdateUI();
 
     if (ActionType === "Feed") {
-        const FeedImages = ['../imgs/eat_raccoon.png', '../imgs/eat_raccoon_2.png'];
+        const FeedImages = ['imgs/eat_raccoon.png', 'imgs/eat_raccoon_2.png'];
         const RandomEatImg = FeedImages[Math.floor(Math.random() * FeedImages.length)];
         PlayAnimation(RandomEatImg, 'pet-jumping', 1500);
     } else if (ActionType === "Water") {
-        PlayAnimation('../imgs/drink_raccoon.png', 'pet-jumping', 1500);
+        PlayAnimation('imgs/drink_raccoon.png', 'pet-jumping', 1500);
     } else if (ActionType === "Pet") {
-        PlayAnimation('../imgs/pet_raccoon.png', 'pet-shaking', 1500);
+        PlayAnimation('imgs/pet_raccoon.png', 'pet-shaking', 1500);
     }
 
     if (ActionType === "Feed" || ActionType === "Water") {
