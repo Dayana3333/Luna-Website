@@ -475,6 +475,7 @@ function SetBackground() {
             document.documentElement.style.setProperty('--button-border', '#9a6040');
             document.documentElement.style.setProperty('--text-accent', '#f3da90');
             document.documentElement.style.setProperty('--pet-name-color', '#f3c4d8');
+            document.documentElement.style.setProperty('--button-hover', '#6b3a1f');
         } else {
             document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #1b264b 0%, #0d1b2a 50%, #010811 100%)');
             document.documentElement.style.setProperty('--panel-border', '#415a77');
@@ -482,6 +483,7 @@ function SetBackground() {
             document.documentElement.style.setProperty('--button-border', '#778da9');
             document.documentElement.style.setProperty('--text-accent', '#e0e1dd');
             document.documentElement.style.setProperty('--pet-name-color', '#ffb3c6');
+            document.documentElement.style.setProperty('--pet-name-color', '#415a77');
         }
     } else {
         const NightHour = Hour < 6 ? Hour : Hour - 20;
@@ -495,6 +497,7 @@ function SetBackground() {
             document.documentElement.style.setProperty('--button-border', '#4d4dbf');
             document.documentElement.style.setProperty('--text-accent', '#80ffea');
             document.documentElement.style.setProperty('--pet-name-color', '#b380ff');
+            document.documentElement.style.setProperty('--button-hover', '#3a3af6');
         } else {
             document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #0a192f 0%, #020c1b 50%, #00050d 100%)');
             document.documentElement.style.setProperty('--panel-border', '#00b4d8');
@@ -502,6 +505,7 @@ function SetBackground() {
             document.documentElement.style.setProperty('--button-border', '#90e0ef');
             document.documentElement.style.setProperty('--text-accent', '#caf0f8');
             document.documentElement.style.setProperty('--pet-name-color', '#00f5d4');
+            document.documentElement.style.setProperty('--button-hover', '#00b4d8');
         }
     }
 }
