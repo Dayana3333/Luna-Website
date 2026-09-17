@@ -740,12 +740,11 @@ body {
 /* --- MOBIL ÉS DISCORD ACTIVITY RESPONSIVE NÉZET (max-width: 900px) --- */
 @media screen and (max-width: 900px) {
     
-    /* 1. Teljesen megszüntetjük a görgetést és a túlcsordulást a főoldalon */
     html, body {
         width: 100% !important;
         height: 100vh !important;
         max-height: 100vh !important;
-        overflow: hidden !important; /* NINCS TÖBB GÖRDÜLÉSI SÁV */
+        overflow: hidden !important; 
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
@@ -762,18 +761,16 @@ body {
     /* 2. FELSŐ FIX MOBIL MENÜSÁV  */
     .mobile-nav-bar {
         display: flex !important;
-        position: fixed !important; 
-        top: 0 !important;
+        position: relative !important; 
+        top: 30px !important;
         left: 0 !important;
         width: 100% !important;
-        
-        height: clamp(50px, 12vw, 60px) !important; 
-        padding: clamp(6px, 2vw, 10px) clamp(10px, 3vw, 16px) !important;
-        gap: clamp(8px, 2vw, 12px) !important;
-        
+        height: 55px !important;
         background: #1a0c06 !important; 
         border-bottom: 2px solid var(--panel-border) !important;
         z-index: 1000 !important; 
+        padding: 8px 12px !important;
+        gap: 10px !important;
         box-sizing: border-box !important;
         flex-shrink: 0 !important;
     }
