@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=63";
+import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=64";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -459,9 +459,9 @@ function SetBackground() {
             document.documentElement.style.setProperty('--text-accent', '#f3da90');
             document.documentElement.style.setProperty('--pet-name-color', '#f3c4d8');
         } else {
-            document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #1b263b 0%, #0d1b2a 50%, #010811 100%)');
+            document.documentElement.style.setProperty('--panel-bg', 'linear-gradient(160deg, #1b264b 0%, #0d1b2a 50%, #010811 100%)');
             document.documentElement.style.setProperty('--panel-border', '#415a77');
-            document.documentElement.style.setProperty('--button-bg', 'linear-gradient(135deg, #415a77, #1b263b)');
+            document.documentElement.style.setProperty('--button-bg', 'linear-gradient(135deg, #415a77, #1b264b)');
             document.documentElement.style.setProperty('--button-border', '#778da9');
             document.documentElement.style.setProperty('--text-accent', '#e0e1dd');
             document.documentElement.style.setProperty('--pet-name-color', '#ffb3c6');
@@ -509,7 +509,7 @@ function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
     if (Raccoon) {
-        Raccoon.src = 'imgs/raccoon.png?v=63';
+        Raccoon.src = 'imgs/raccoon.png?v=64';
         Raccoon.classList.add('pet-idle');
     }
 }
@@ -528,7 +528,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
     ActivityTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = 'imgs/raccoon.png?v=63';
+            Raccoon.src = 'imgs/raccoon.png?v=64';
             if (CssClass) Raccoon.classList.remove(CssClass);
             Raccoon.classList.add('pet-idle');
         }
