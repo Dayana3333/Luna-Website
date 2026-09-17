@@ -1153,7 +1153,12 @@ const fortuneMessages = [
     "A pleasant surprise is waiting for you! 🌸",
     "Relax, take a deep breath, everything is fine. ☁️",
     "Today is a perfect day for some warm ramen! 🍜",
-    "Your kindness will be rewarded soon. ❤️"
+    "Your kindness will be rewarded soon. ❤️",
+    "An unexpected adventure awaits around the corner! 🗺️",
+    "Someone is thinking of you fondly today. 💫",
+    "Take a break and listen to your favorite song! 🎧",
+    "A cozy nap is calling your name. 😴",
+    "Your creativity will shine brightly today! 🎨"
 ];
 
 function clickFortuneCookie() {
