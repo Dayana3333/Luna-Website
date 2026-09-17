@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=51";
+import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk?v=52";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -371,7 +371,7 @@ let SleepTimer = null;
 const SleepDelay = 5 * 60 * 1000;
 let isPlaying = false;
 
-const radioAudio = new Audio('../audio/lofi-music.mp3');
+const radioAudio = new Audio('audio/lofi-music.mp3');
 radioAudio.loop = true;
 radioAudio.volume = 0.25;
 
