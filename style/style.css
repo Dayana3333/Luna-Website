@@ -697,7 +697,7 @@ body {
 
     #minigame-box, .panel, .ShopPanel, .StatusPanel {
         width: 100% !important;
-        max-width: 400px !important; 
+        max-width: 450px !important; 
         margin: 10px 0 !important;
         box-sizing: border-box;
     }
@@ -787,7 +787,7 @@ body {
         cursor: pointer !important;
     }
 
-    /* 3. KÖZÉPSŐ JÁTÉKTÉR (Kényelmesen elfér görgetés nélkül) */
+    /* 3. KÖZÉPSŐ JÁTÉKTÉR  */
     .PetArea {
         width: 100% !important;
         max-width: 400px !important;
@@ -809,7 +809,7 @@ body {
 
     #Raccoon {
         width: 100% !important;
-        max-width: 220px !important; /* Kicsit optimalizálva, hogy sehol se lógjon ki */
+        max-width: 220px !important; 
         height: auto !important;
     }
 
