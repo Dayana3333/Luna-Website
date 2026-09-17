@@ -1,5 +1,5 @@
 // Discord SDK is bundled locally as a real ES module with no external imports.
-import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=65";
+import { DiscordSDK, patchUrlMappings } from "../vendor/discord-sdk.js?v=67";
 
 // Supabase is loaded globally via a <script> tag in index.html (see vendor/supabase.js),
 // so it's available here as window.supabase — no import needed, this avoids CSP issues.
@@ -519,7 +519,7 @@ function WakeUp() {
     if (SleepTimer) clearTimeout(SleepTimer);
     if (ActivityTimer) clearTimeout(ActivityTimer);
     if (Raccoon) {
-        Raccoon.src = 'imgs/raccoon.png?v=66';
+        Raccoon.src = 'imgs/raccoon.png';
         Raccoon.classList.add('pet-idle');
     }
 }
@@ -538,7 +538,7 @@ function PlayAnimation(Source, CssClass, DurationMS = 2000) {
 
     ActivityTimer = setTimeout(() => {
         if (Raccoon) {
-            Raccoon.src = 'imgs/raccoon.png?v=66';
+            Raccoon.src = 'imgs/raccoon.png';
             if (CssClass) Raccoon.classList.remove(CssClass);
             Raccoon.classList.add('pet-idle');
         }
