@@ -483,7 +483,7 @@ function SetBackground() {
             document.documentElement.style.setProperty('--button-border', '#778da9');
             document.documentElement.style.setProperty('--text-accent', '#e0e1dd');
             document.documentElement.style.setProperty('--pet-name-color', '#ffb3c6');
-            document.documentElement.style.setProperty('--pet-name-color', '#415a77');
+            document.documentElement.style.setProperty('--button-hover', '#415a77');
         }
     } else {
         const NightHour = Hour < 6 ? Hour : Hour - 20;

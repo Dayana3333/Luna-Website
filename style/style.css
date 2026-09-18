@@ -24,6 +24,7 @@
   --button-border: #9a6040;
   --text-accent: #f3da90;
   --pet-name-color: var(--pet-name-color);
+  --button-hover: var(--button-hover);
 }
 
 * {
@@ -259,7 +260,7 @@ body {
 }
 
 .ShopSortDropdown:hover {
-  background: linear-gradient(135deg, #9a6040, #7c4f2d);
+  background: var(--button-hover);
 }
 
 .ShopSortDropdown:focus {
@@ -354,7 +355,7 @@ body {
 }
 
 .BuyButton:hover {
-  background: linear-gradient(135deg, #9a6040, #7c4f2d);
+  background: var(--button-hover);
   transform: scale(1.05);
 }
 
@@ -504,7 +505,7 @@ body {
 }
 
 .game-btn:hover {
-    background: linear-gradient(135deg, #9a6040, #7c4f2d);
+    background: var(--button-hover);
     transform: scale(1.03);
 }
 
